@@ -93,6 +93,12 @@ You can find files recursively using `-r` option.
 tfmv -r -j tfmv.jsonnet
 ```
 
+The following directories are ignored:
+
+- .git
+- .terraform
+- node_modules
+
 ## Jsonnet
 
 tfmv uses [Jsonnet](https://jsonnet.org) to enable you to define a custom rename logic.
