@@ -38,6 +38,7 @@ func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) er
 	// read *.tf
 	editor := &Editor{
 		stderr: c.stderr,
+		dryRun: input.DryRun,
 	}
 	for _, file := range files {
 		logE := logE.WithField("file", file)
@@ -96,9 +97,14 @@ func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, ja ast.Node
 	}
 	movedFile := filepath.Join(filepath.Dir(block.File), fileName)
 	logE.WithField("moved_file", movedFile).Debug("generating a moved block")
-	if err := c.writeMovedBlock(block, dest, movedFile); err != nil {
-		return fmt.Errorf("write a moved block: %w", err)
+	if input.DryRun {
+		logE.WithField("moved_file", movedFile).Info("[DRY RUN] generate a moved block")
+	} else {
+		if err := c.writeMovedBlock(block, dest, movedFile); err != nil {
+			return fmt.Errorf("write a moved block: %w", err)
+		}
 	}
+
 	// rename resources
 	logE.Debug("moving a block")
 	if err := editor.Move(logE, &MoveBlockOpt{

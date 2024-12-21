@@ -69,6 +69,14 @@ You can also pass *.tf via arguments:
 tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
 ```
 
+### Dry Run: --dry-run
+
+With `--dry-run`, tfmv outputs logs but doesn't rename blocks.
+
+```sh
+tfmv -j tfmv.jsonnet --dry-run bar/main.tf
+```
+
 ### Change the filename for moved blocks
 
 By default tfmv writes moved blocks to `moved.tf`.
