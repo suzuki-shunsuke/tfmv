@@ -19,7 +19,7 @@ brew install suzuki-shunsuke/tfmv/tfmv
 
 ## aqua
 
-[aqua-registry >= v4.272.0](https://github.com/aquaproj/aqua-registry/releases/tag/v4.272.0)
+[aqua-registry >= v4.282.0](https://github.com/aquaproj/aqua-registry/releases/tag/v4.282.0)
 
 You can install tfmv using [aqua](https://aquaproj.github.io/).
 
