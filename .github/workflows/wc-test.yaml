@@ -28,13 +28,30 @@ jobs:
       - run: go install ./cmd/tfmv
       - run: tfmv --version
       - run: tfmv --help
+
       - run: tfmv -j tfmv.jsonnet
         working-directory: example
+      - run: diff main.tf expected_main.tf
+        working-directory: example
+
       - run: tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
         working-directory: example
+      - run: diff foo/aws_s3_bucket.tf foo/expected_aws_s3_bucket.tf
+        working-directory: example
+      - run: diff foo/aws_instance.tf foo/expected_aws_instance.tf
+        working-directory: example
+
       - run: tfmv -j tfmv.jsonnet -m moved_blocks.tf bar/main.tf
         working-directory: example
+      - run: diff bar/main.tf bar/expected_main.tf
+        working-directory: example
+
       - run: tfmv -j tfmv.jsonnet -m same bar/foo.tf
         working-directory: example
+      - run: diff bar/foo.tf bar/expected_foo.tf
+        working-directory: example
+
       - run: tfmv -r -j tfmv.jsonnet
+        working-directory: example
+      - run: diff foo/nest/main.tf foo/next/expected_main.tf
         working-directory: example
