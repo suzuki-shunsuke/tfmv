@@ -75,7 +75,7 @@ func parseFlags(f *Flag) {
 	flag.StringVarP(&f.Jsonnet, "jsonnet", "j", "", "Jsonnet file path")
 	flag.StringVarP(&f.Moved, "moved", "m", "moved.tf", "The destination file name")
 	flag.StringVar(&f.LogLevel, "log-level", "info", "The log level")
-	flag.StringVar(&f.LogLevel, "log-color", "auto", "The log color")
+	flag.StringVar(&f.LogColor, "log-color", "auto", "The log color")
 	flag.BoolVarP(&f.Help, "help", "h", false, "Show help")
 	flag.BoolVarP(&f.Version, "version", "v", false, "Show version")
 	flag.BoolVarP(&f.Recursive, "recursive", "r", false, "If this is set, tfmv finds files recursively")
