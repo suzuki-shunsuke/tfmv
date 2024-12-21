@@ -1,12 +1,12 @@
 # tfmv
 
-[MIT LICENSE](LICENSE) | [Install](docs/install.md)
+[![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/suzuki-shunsuke/tfmv/main/LICENSE) | [Install](docs/install.md)
 
 CLI to rename Terraform resources and modules and generate moved blocks.
 
 ## Getting Started
 
-1. [Install tfmv](#install)
+1. [Install tfmv](docs/install.md)
 1. Checkout this repository
 
 ```sh
