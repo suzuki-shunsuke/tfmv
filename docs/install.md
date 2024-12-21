@@ -35,7 +35,7 @@ cd tfmv
 go install ./cmd/tfmv
 ```
 
-> ![CAUTION]
+> [!WARNING]
 > Unfortunately, `go install github.com/suzuki-shunsuke/tfmv/cmd/tfmv@latest` doesn't work because tfmv uses a replace directive in go.mod.
 > 
 > ```console
