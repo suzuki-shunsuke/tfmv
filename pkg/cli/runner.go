@@ -56,6 +56,7 @@ func (r *Runner) Run(ctx context.Context) error {
 		File:      flg.Jsonnet,
 		Dest:      flg.Moved,
 		Recursive: flg.Recursive,
+		DryRun:    flg.DryRun,
 		Args:      flg.Args,
 	})
 }
@@ -65,10 +66,11 @@ type Flag struct {
 	Moved     string
 	LogLevel  string
 	LogColor  string
+	Args      []string
 	Help      bool
 	Version   bool
 	Recursive bool
-	Args      []string
+	DryRun    bool
 }
 
 func parseFlags(f *Flag) {
@@ -79,6 +81,7 @@ func parseFlags(f *Flag) {
 	flag.BoolVarP(&f.Help, "help", "h", false, "Show help")
 	flag.BoolVarP(&f.Version, "version", "v", false, "Show version")
 	flag.BoolVarP(&f.Recursive, "recursive", "r", false, "If this is set, tfmv finds files recursively")
+	flag.BoolVar(&f.DryRun, "dry-run", false, "Dry Run")
 	flag.Parse()
 	f.Args = flag.Args()
 }
@@ -94,6 +97,7 @@ Options:
 	--version, -v    Show sort-issue-template version
 	--jsonnet, -j    Jsonnet file path
 	--recursive, -r  If this is set, tfmv finds files recursively
+	--dry-run        Dry Run
 	--log-level      Log level
 	--log-color      Log color. "auto", "always", "never" are available
 	--moved, -m      The destination file name. If this is "same", the file is same with the resource`
