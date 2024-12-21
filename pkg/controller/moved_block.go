@@ -3,6 +3,8 @@ package controller
 import (
 	"fmt"
 	"os"
+
+	"github.com/spf13/afero"
 )
 
 func (c *Controller) writeMovedBlock(block *Block, dest, movedFile string) error {
@@ -11,10 +13,14 @@ func (c *Controller) writeMovedBlock(block *Block, dest, movedFile string) error
 		return fmt.Errorf("open a file: %w", err)
 	}
 	defer file.Close()
-	fmt.Fprintf(file, `moved {
+	content := fmt.Sprintf(`moved {
   from = %s.%s
   to   = %s.%s
 }
 `, block.ResourceType, block.Name, block.ResourceType, dest)
+	if f, err := afero.Exists(c.fs, movedFile); err == nil && f {
+		content = "\n" + content
+	}
+	fmt.Fprint(file, content)
 	return nil
 }
