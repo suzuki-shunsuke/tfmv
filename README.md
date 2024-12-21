@@ -33,7 +33,7 @@ tfmv uses Jsonnet to rename resources flexibly.
 tfmv.jsonnet:
 
 ```jsonnet
-std.native("strings.Replace")(input.name, "-", "_", -1)
+std.native("strings.Replace")(std.extVar('input').name, "-", "_", -1)[0]
 ```
 
 Run `tfmv -j tfmv.jsonnet`.

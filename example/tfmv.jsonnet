@@ -1,1 +1,1 @@
-std.native("strings.Replace")(input.name, "-", "_", -1)
+std.native("strings.Replace")(std.extVar('input').name, "-", "_", -1)[0]
