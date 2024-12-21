@@ -1,3 +1,3 @@
-module "foo_production" {
+module "foo_prod" {
   source = "./module"
 }
