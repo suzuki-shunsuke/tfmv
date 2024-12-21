@@ -62,7 +62,7 @@ brews:
     # Template of your app's description.
     # Default is empty.
     description: |
-      Create GitHub Issues from GitHub Discussions
+      Rename Terraform resources and modules and generate moved blocks. You can rename blocks flexibly using Jsonnet.
     license: MIT
 
     # Setting this will prevent goreleaser to actually try to commit the updated
@@ -82,13 +82,13 @@ brews:
     #
     # Template: allowed
     # Since: v1.20
-    extra_install: |
-      generate_completions_from_executable(bin/"tfmv", "completion", shells: [:bash, :zsh, :fish])
+    # extra_install: |
+    #   generate_completions_from_executable(bin/"tfmv", "completion", shells: [:bash, :zsh, :fish])
 
 scoops:
   -
     description: |
-      Create GitHub Issues from GitHub Discussions
+      Rename Terraform resources and modules and generate moved blocks. You can rename blocks flexibly using Jsonnet.
     license: MIT
     skip_upload: auto
     repository:
