@@ -26,71 +26,15 @@ jobs:
           AQUA_GITHUB_TOKEN: ${{github.token}}
       - run: go test -v ./... -race -covermode=atomic
       - run: go install ./cmd/tfmv
-      - name: Test help
-        run: tfmv help
-      - name: Test version
-        run: tfmv version
-      - name: Test version -json
-        run: tfmv version -json
-      - name: Test get-discussion
-        run: tfmv get-discussion https://github.com/suzuki-shunsuke/test-tfmv/discussions/1 > discussions.json
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      - name: Test get-discussion -query
-        run: tfmv get-discussion -query 'repo:"suzuki-shunsuke/test-tfmv"'
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-
-      - name: Test dry run
-        run: tfmv run -repo-name test-tfmv -data discussions.json -dry-run
-        if: |
-          !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-
-      - uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
-        id: token
-        if: |
-          !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
-        with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "issues": "write"
-            }
-          repositories: >-
-            [
-              "test-tfmv"
-            ]
-      - name: Test run -data
-        run: tfmv run -data discussions.json
-        if: |
-          !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
-        env:
-          GITHUB_TOKEN: ${{steps.token.outputs.token}}
-
-      - name: Test run -query
-        run: tfmv run -q 'repo:"suzuki-shunsuke/test-tfmv"'
-        if: |
-          !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
-        env:
-          GITHUB_TOKEN: ${{steps.token.outputs.token}}
-
-      - name: Test -lock and -close options
-        run: tfmv run -lock never -close never https://github.com/suzuki-shunsuke/test-tfmv/discussions/1
-        if: |
-          !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
-        env:
-          GITHUB_TOKEN: ${{steps.token.outputs.token}}
-
-      - name: Test -lock-discussion and -close-discussion options
-        run: tfmv run -lock-discussion -close-discussion https://github.com/suzuki-shunsuke/test-tfmv/discussions/102
-        if: |
-          !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
-        env:
-          GITHUB_TOKEN: ${{steps.token.outputs.token}}
-
-      - name: Test create-config
-        run: tfmv create-config
-      - run: cat tfmv.yaml
+      - run: tfmv --version
+      - run: tfmv --help
+      - run: tfmv -j tfmv.jsonnet
+        working-directory: example
+      - run: tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
+        working-directory: example
+      - run: tfmv -j tfmv.jsonnet -m moved_blocks.tf bar/main.tf
+        working-directory: example
+      - run: tfmv -j tfmv.jsonnet -m same bar/foo.tf
+        working-directory: example
+      - run: tfmv -r -j tfmv.jsonnet
+        working-directory: example
