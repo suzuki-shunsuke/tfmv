@@ -1,16 +1,8 @@
 # tfmv
 
+[MIT LICENSE](LICENSE) | [Install](docs/install.md)
+
 CLI to rename Terraform resources and modules and generate moved blocks.
-
-## Install
-
-```sh
-brew install suzuki-shunsuke/tfmv/tfmv
-```
-
-```sh
-go install github.com/suzuki-shunsuke/tfmv/cmd/tfmv@latest
-```
 
 ## Getting Started
 
