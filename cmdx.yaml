@@ -46,3 +46,11 @@ tasks:
     description: Format GO codes
     usage: Format GO codes
     script: bash scripts/fmt.sh
+  - name: rm-moved
+    description: Remove moved.tf
+    usage: Remove moved.tf
+    short: rmm
+    script: |
+      set -euo pipefail
+      find example -name moved.tf | xargs rm
+      find example -name moved_blocks.tf | xargs rm

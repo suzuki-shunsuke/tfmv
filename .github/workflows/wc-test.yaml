@@ -29,7 +29,7 @@ jobs:
       - run: tfmv --version
       - run: tfmv --help
 
-      - run: tfmv -j tfmv.jsonnet
+      - run: tfmv --replace "-/_"
         working-directory: example
       - run: diff main.tf expected_main.tf
         working-directory: example

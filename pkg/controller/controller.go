@@ -22,6 +22,7 @@ func (c *Controller) Init(fs afero.Fs, stdout, stderr io.Writer) {
 type Input struct {
 	File      string
 	Dest      string
+	Replace   string
 	Args      []string
 	Recursive bool
 	DryRun    bool

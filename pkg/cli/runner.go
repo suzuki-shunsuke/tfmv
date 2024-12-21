@@ -58,6 +58,7 @@ func (r *Runner) Run(ctx context.Context) error {
 		Recursive: flg.Recursive,
 		DryRun:    flg.DryRun,
 		Args:      flg.Args,
+		Replace:   flg.Replace,
 	})
 }
 
@@ -66,6 +67,7 @@ type Flag struct {
 	Moved     string
 	LogLevel  string
 	LogColor  string
+	Replace   string
 	Args      []string
 	Help      bool
 	Version   bool
@@ -76,6 +78,7 @@ type Flag struct {
 func parseFlags(f *Flag) {
 	flag.StringVarP(&f.Jsonnet, "jsonnet", "j", "", "Jsonnet file path")
 	flag.StringVarP(&f.Moved, "moved", "m", "moved.tf", "The destination file name")
+	flag.StringVar(&f.Replace, "replace", "", "Replace strings in block names. The format is <new>/<old>. e.g. -/_")
 	flag.StringVar(&f.LogLevel, "log-level", "info", "The log level")
 	flag.StringVar(&f.LogColor, "log-color", "auto", "The log color")
 	flag.BoolVarP(&f.Help, "help", "h", false, "Show help")
@@ -97,6 +100,7 @@ Options:
 	--version, -v    Show sort-issue-template version
 	--jsonnet, -j    Jsonnet file path
 	--recursive, -r  If this is set, tfmv finds files recursively
+	--replace        Replace strings in block names. The format is <new>/<old>. e.g. -/_
 	--dry-run        Dry Run
 	--log-level      Log level
 	--log-color      Log color. "auto", "always", "never" are available

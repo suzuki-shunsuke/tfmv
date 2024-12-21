@@ -1,18 +1,13 @@
 # tfmv
 
+[MIT LICENSE](LICENSE) | [Install](docs/install.md)
+
 CLI to rename Terraform resources and modules and generate moved blocks.
-You can rename blocks flexibly using [Jsonnet](https://jsonnet.org).
-
-## Install
-
-```
-go install github.com/suzuki-shunsuke/tfmv/cmd/tfmv@latest
-```
 
 ## Getting Started
 
-1. Install tfmv
-1. Checkout a repository
+1. [Install tfmv](#install)
+1. Checkout this repository
 
 ```sh
 git clone https://github.com/suzuki-shunsuke/tfmv
@@ -26,21 +21,15 @@ resource "null_resource" "foo-prod" {}
 ```
 
 Let's replace `-` with `_`.
+You need to specify either `--replace` or `--jsonnet (-j)`.
+In this case, let's use `--replace`.
+[If you need more flexible renaming, you can use Jsonnet. For details, please see here](#jsonnet).
 
-tfmv uses Jsonnet to rename resources flexibly.
-[For details of Jsonnet, please see here](#jsonnet).
-
-tfmv.jsonnet:
-
-```jsonnet
-std.native("strings.Replace")(std.extVar('input').name, "-", "_", -1)[0]
-```
-
-Run `tfmv -j tfmv.jsonnet`.
+Run `tfmv --replace "-/_"`.
 You don't need to run `terraform init`.
 
 ```sh
-tfmv -j tfmv.jsonnet
+tfmv --replace "-/_"
 ```
 
 Then a resource name is changed and `moved.tf` is created.
@@ -66,7 +55,7 @@ moved {
 You can also pass *.tf via arguments:
 
 ```sh
-tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
+tfmv --replace "-/_" foo/aws_s3_bucket.tf foo/aws_instance.tf
 ```
 
 ### Dry Run: --dry-run
@@ -74,7 +63,7 @@ tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
 With `--dry-run`, tfmv outputs logs but doesn't rename blocks.
 
 ```sh
-tfmv -j tfmv.jsonnet --dry-run bar/main.tf
+tfmv --replace "-/_" --dry-run bar/main.tf
 ```
 
 ### Change the filename for moved blocks
@@ -83,13 +72,13 @@ By default tfmv writes moved blocks to `moved.tf`.
 You can change the file name via `-m` option.
 
 ```sh
-tfmv -j tfmv.jsonnet -m moved_blocks.tf bar/main.tf
+tfmv --replace "-/_" -m moved_blocks.tf bar/main.tf
 ```
 
 You can also write moved blocks to the same file with renamed resources and modules.
 
 ```sh
-tfmv -j tfmv.jsonnet -m same bar/foo.tf
+tfmv --replace "-/_" -m same bar/foo.tf
 ```
 
 ### `-r` Recursive option
@@ -98,7 +87,7 @@ By default, tfmv finds *.tf on the current directory.
 You can find files recursively using `-r` option.
 
 ```sh
-tfmv -r -j tfmv.jsonnet
+tfmv -r --replace "-/_"
 ```
 
 The following directories are ignored:
@@ -109,7 +98,20 @@ The following directories are ignored:
 
 ## Jsonnet
 
-tfmv uses [Jsonnet](https://jsonnet.org) to enable you to define a custom rename logic.
+`--replace` is simple and useful, but sometimes you need more flexible renaming.
+In that case, you can use `--jsonnet (-j)`.
+[Jsonnet](https://jsonnet.org) is a powerful data configuration language.
+
+tfmv.jsonnet (You can change the filename freely):
+
+```jsonnet
+std.native("strings.Replace")(std.extVar('input').name, "-", "_", -1)[0]
+```
+
+```sh
+tfmv -j tfmv.jsonnet
+```
+
 You need to define Jsonnet whose input is each resource and output is a new resource name.
 tfmv passes an input via External Variables.
 You can access an input by `std.extVar('input')`.

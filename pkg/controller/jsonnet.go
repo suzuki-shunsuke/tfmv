@@ -11,15 +11,37 @@ import (
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/path/filepath"
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/regexp"
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/strings"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 )
 
-func (c *Controller) evaluate(block *Block, ja ast.Node) (string, error) {
+type JsonnetRenamer struct {
+	node ast.Node
+}
+
+func NewJsonnetRenamer(logE *logrus.Entry, fs afero.Fs, file string) (*JsonnetRenamer, error) {
+	// read Jsonnet
+	logE.Debug("reading a jsonnet file")
+	b, err := afero.ReadFile(fs, file)
+	if err != nil {
+		return nil, fmt.Errorf("read a jsonnet file: %w", err)
+	}
+	// parse Jsonnet
+	logE.Debug("parsing a jsonnet file")
+	node, err := jsonnet.SnippetToAST(file, string(b))
+	if err != nil {
+		return nil, fmt.Errorf("parse a jsonnet file: %w", err)
+	}
+	return &JsonnetRenamer{node: node}, nil
+}
+
+func (j *JsonnetRenamer) Rename(block *Block) (string, error) {
 	b, err := json.Marshal(block)
 	if err != nil {
 		return "", fmt.Errorf("marshal a block: %w", err)
 	}
 	vm := NewVM(string(b))
-	result, err := vm.Evaluate(ja)
+	result, err := vm.Evaluate(j.node)
 	if err != nil {
 		return "", fmt.Errorf("evaluate Jsonnet: %w", err)
 	}
