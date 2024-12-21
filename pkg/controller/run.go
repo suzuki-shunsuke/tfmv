@@ -2,27 +2,51 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 
-	"github.com/google/go-jsonnet"
-	"github.com/google/go-jsonnet/ast"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
+type Renamer interface {
+	Rename(block *Block) (string, error)
+}
+
+type ReplaceRenamer struct {
+	old string
+	new string
+}
+
+func NewReplaceRenamer(s string) (*ReplaceRenamer, error) {
+	o, n, ok := strings.Cut(s, "/")
+	if !ok {
+		return nil, fmt.Errorf("--repace must include /: %s", s)
+	}
+	return &ReplaceRenamer{old: o, new: n}, nil
+}
+
+func (r *ReplaceRenamer) Rename(block *Block) (string, error) {
+	return strings.ReplaceAll(block.Name, r.old, r.new), nil
+}
+
+func NewRenamer(logE *logrus.Entry, fs afero.Fs, input *Input) (Renamer, error) {
+	if input.Replace != "" {
+		return NewReplaceRenamer(input.Replace)
+	}
+	if input.File != "" {
+		return NewJsonnetRenamer(logE, fs, input.File)
+	}
+	return nil, errors.New("either --jsonnet or --replace must be specified")
+}
+
 func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) error {
 	// read Jsonnet
-	logE.Debug("reading a jsonnet file")
-	b, err := afero.ReadFile(c.fs, input.File)
+	renamer, err := NewRenamer(logE, c.fs, input)
 	if err != nil {
-		return fmt.Errorf("read a jsonnet file: %w", err)
-	}
-	// parse Jsonnet
-	logE.Debug("parsing a jsonnet file")
-	ja, err := jsonnet.SnippetToAST(input.File, string(b))
-	if err != nil {
-		return fmt.Errorf("parse a jsonnet file: %w", err)
+		return err
 	}
 	// find *.tf
 	logE.Debug("finding tf files")
@@ -43,14 +67,14 @@ func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) er
 	for _, file := range files {
 		logE := logE.WithField("file", file)
 		logE.Debug("handling a file")
-		if err := c.handleFile(logE, editor, ja, input, file); err != nil {
+		if err := c.handleFile(logE, editor, renamer, input, file); err != nil {
 			return fmt.Errorf("handle a file: %w", err)
 		}
 	}
 	return nil
 }
 
-func (c *Controller) handleFile(logE *logrus.Entry, editor *Editor, ja ast.Node, input *Input, file string) error {
+func (c *Controller) handleFile(logE *logrus.Entry, editor *Editor, renamer Renamer, input *Input, file string) error {
 	logE.Debug("reading a tf file")
 	b, err := afero.ReadFile(c.fs, file)
 	if err != nil {
@@ -73,16 +97,16 @@ func (c *Controller) handleFile(logE *logrus.Entry, editor *Editor, ja ast.Node,
 			"name":          block.Name,
 		})
 		logE.Debug("handling a block")
-		if err := c.handleBlock(logE, editor, ja, input, file, block); err != nil {
+		if err := c.handleBlock(logE, editor, renamer, input, file, block); err != nil {
 			return fmt.Errorf("handle a block: %w", err)
 		}
 	}
 	return nil
 }
 
-func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, ja ast.Node, input *Input, file string, block *Block) error {
+func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, renamer Renamer, input *Input, file string, block *Block) error {
 	// evaluate Jsonnet
-	dest, err := c.evaluate(block, ja)
+	dest, err := renamer.Rename(block)
 	if err != nil {
 		return fmt.Errorf("evaluate Jsonnet: %w", err)
 	}
