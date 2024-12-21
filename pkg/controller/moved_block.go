@@ -18,6 +18,13 @@ func (c *Controller) writeMovedBlock(block *Block, dest, movedFile string) error
   to   = %s.%s
 }
 `, block.ResourceType, block.Name, block.ResourceType, dest)
+	if !block.IsResource() {
+		content = fmt.Sprintf(`moved {
+  from = module.%s
+  to   = module.%s
+}
+`, block.Name, dest)
+	}
 	if f, err := afero.Exists(c.fs, movedFile); err == nil && f {
 		content = "\n" + content
 	}

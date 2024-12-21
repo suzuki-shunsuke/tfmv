@@ -37,19 +37,19 @@ type Block struct {
 	Name         string `json:"name"`
 }
 
-func (b *Block) IsResouce() bool {
+func (b *Block) IsResource() bool {
 	return b.BlockType == wordResource
 }
 
 func (b *Block) Address() string {
-	if b.IsResouce() {
+	if b.IsResource() {
 		return fmt.Sprintf("resource.%s.%s", b.ResourceType, b.Name)
 	}
 	return "module." + b.Name
 }
 
 func (b *Block) NewAddress(name string) string {
-	if b.IsResouce() {
+	if b.IsResource() {
 		return fmt.Sprintf("resource.%s.%s", b.ResourceType, name)
 	}
 	return "module." + name

@@ -58,6 +58,12 @@ You can also pass *.tf via arguments:
 tfmv --replace "-/_" foo/aws_s3_bucket.tf foo/aws_instance.tf
 ```
 
+tfmv supports modules too.
+
+```sh
+tfmv --replace "production/prod" foo/module_foo.tf
+```
+
 ### Dry Run: --dry-run
 
 With `--dry-run`, tfmv outputs logs but doesn't rename blocks.
