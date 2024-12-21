@@ -1,0 +1,27 @@
+# Native functions
+
+Please see [API design](https://github.com/lintnet/go-jsonnet-native-functions?tab=readme-ov-file#api-design) too.
+
+- [filepath.Base](https://pkg.go.dev/path/filepath#Base)
+- [path.Base](https://pkg.go.dev/path#Base)
+- [path.Clean](https://pkg.go.dev/path#Clean)
+- [path.Dir](https://pkg.go.dev/path#Dir)
+- [path.Ext](https://pkg.go.dev/path#Ext)
+- [path.IsAbs](https://pkg.go.dev/path#IsAbs)
+- [path.Match](https://pkg.go.dev/path#Match)
+- [path.Split](https://pkg.go.dev/path#Split)
+- [regexp.MatchString](https://pkg.go.dev/regexp#MatchString)
+- [strings.Contains](https://pkg.go.dev/strings#Contains)
+- [strings.ContainsAny](https://pkg.go.dev/strings#ContainsAny)
+- [strings.Count](https://pkg.go.dev/strings#Count)
+- [strings.Cut](https://pkg.go.dev/strings#Cut)
+- [strings.CutPrefix](https://pkg.go.dev/strings#CutPrefix)
+- [strings.CutSuffix](https://pkg.go.dev/strings#CutSuffix)
+- [strings.EqualFold](https://pkg.go.dev/strings#EqualFold)
+- [strings.Fields](https://pkg.go.dev/strings#Fields)
+- [strings.LastIndex](https://pkg.go.dev/strings#LastIndex)
+- [strings.LastIndexAny](https://pkg.go.dev/strings#LastIndexAny)
+- [strings.Repeat](https://pkg.go.dev/strings#Repeat)
+- [strings.Replace](https://pkg.go.dev/strings#Replace)
+- [strings.TrimPrefix](https://pkg.go.dev/strings#TrimPrefix)
+- [strings.TrimSpace](https://pkg.go.dev/strings#TrimSpace)

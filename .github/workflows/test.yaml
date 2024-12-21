@@ -1,0 +1,83 @@
+---
+name: test
+on: pull_request
+permissions: {}
+concurrency:
+  group: ${{ github.workflow }}--${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  path-filter:
+    # Get changed files to filter jobs
+    timeout-minutes: 30
+    outputs:
+      update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
+      renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
+      go-mod-tidy: ${{steps.changes.outputs.go-mod-tidy}}
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: changes
+        with:
+          filters: |
+            update-aqua-checksums:
+              - aqua/aqua.yaml
+              - aqua/imports/*.yaml
+              - aqua/aqua-checksums.json
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-update-aqua-checksums.yaml
+            renovate-config-validator:
+              - renovate.json5
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-renovate-config-validator.yaml
+            go-mod-tidy:
+              - go.mod
+              - go.sum
+              - "**.go"
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-go-mod-tidy.yaml
+
+  status-check:
+    uses: ./.github/workflows/wc-status-check.yaml
+    permissions: {}
+    if: failure()
+    needs:
+      - renovate-config-validator
+      - update-aqua-checksums
+      - test
+      - go-mod-tidy
+
+  renovate-config-validator:
+    uses: ./.github/workflows/wc-renovate-config-validator.yaml
+    needs: path-filter
+    if: needs.path-filter.outputs.renovate-config-validator == 'true'
+    permissions:
+      contents: read
+
+  update-aqua-checksums:
+    needs: path-filter
+    if: needs.path-filter.outputs.update-aqua-checksums == 'true'
+    uses: ./.github/workflows/wc-update-aqua-checksums.yaml
+    permissions:
+      contents: read
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+
+  test:
+    uses: ./.github/workflows/wc-test.yaml
+    needs: path-filter
+    permissions: {}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+
+  go-mod-tidy:
+    uses: ./.github/workflows/wc-go-mod-tidy.yaml
+    needs: path-filter
+    if: needs.path-filter.outputs.go-mod-tidy == 'true'
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+    permissions:
+      contents: read

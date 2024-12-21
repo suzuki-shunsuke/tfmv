@@ -1,0 +1,57 @@
+---
+name: wc-test
+on:
+  workflow_call:
+    secrets:
+      gh_app_id:
+        required: true
+      gh_app_private_key:
+        required: true
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
+        with:
+          go-version-file: go.mod
+      - uses: aquaproj/aqua-installer@f13c5d2f0357708d85477aabe50fd3f725528745 # v3.1.0
+        with:
+          aqua_version: v2.40.0
+      - run: golangci-lint run --timeout 120s
+        env:
+          AQUA_GITHUB_TOKEN: ${{github.token}}
+      - run: go test -v ./... -race -covermode=atomic
+      - run: go install ./cmd/tfmv
+      - run: tfmv --version
+      - run: tfmv --help
+
+      - run: tfmv -j tfmv.jsonnet
+        working-directory: example
+      - run: diff main.tf expected_main.tf
+        working-directory: example
+
+      - run: tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
+        working-directory: example
+      - run: diff foo/aws_s3_bucket.tf foo/expected_aws_s3_bucket.tf
+        working-directory: example
+      - run: diff foo/aws_instance.tf foo/expected_aws_instance.tf
+        working-directory: example
+
+      - run: tfmv -j tfmv.jsonnet -m moved_blocks.tf bar/main.tf
+        working-directory: example
+      - run: diff bar/main.tf bar/expected_main.tf
+        working-directory: example
+
+      - run: tfmv -j tfmv.jsonnet -m same bar/foo.tf
+        working-directory: example
+      - run: diff bar/foo.tf bar/expected_foo.tf
+        working-directory: example
+
+      - run: tfmv -r -j tfmv.jsonnet
+        working-directory: example
+      - run: diff foo/nest/main.tf foo/nest/expected_main.tf
+        working-directory: example
