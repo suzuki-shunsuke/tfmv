@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	flag "github.com/spf13/pflag"
 	"github.com/suzuki-shunsuke/tfmv/pkg/controller"
 )
 
@@ -39,38 +39,38 @@ func (r *Runner) Run(ctx context.Context, args ...string) error {
 		fmt.Fprintln(r.Stdout, help)
 		return nil
 	}
-	if flg.Dest != "same" {
-		if !strings.HasSuffix(flg.Dest, ".tf") {
-			return errors.New("--dest name must be either 'same' or a file name with the suffix .tf")
+	if flg.Moved != "same" {
+		if !strings.HasSuffix(flg.Moved, ".tf") {
+			return errors.New("--moved name must be either 'same' or a file name with the suffix .tf")
 		}
-		if filepath.Base(flg.Dest) != flg.Dest {
-			return errors.New("--dest name must be either 'same' or a file name with the suffix .tf")
+		if filepath.Base(flg.Moved) != flg.Moved {
+			return errors.New("--moved name must be either 'same' or a file name with the suffix .tf")
 		}
 	}
 	ctrl := &controller.Controller{}
 	ctrl.Init(afero.NewOsFs(), r.Stdout, r.Stderr)
 	return ctrl.Run(ctx, r.LogE, &controller.Input{ //nolint:wrapcheck
-		File:      flg.File,
-		Dest:      flg.Dest,
+		File:      flg.Jsonnet,
+		Dest:      flg.Moved,
 		Recursive: flg.Recursive,
 		Args:      args,
 	})
 }
 
 type Flag struct {
-	File      string
-	Dest      string
+	Jsonnet   string
+	Moved     string
 	Help      bool
 	Version   bool
 	Recursive bool
 }
 
 func parseFlags(f *Flag) {
-	flag.StringVar(&f.File, "file", "", "Jsonnet file path")
-	flag.StringVar(&f.Dest, "dest", "moved.tf", "The destination file name")
-	flag.BoolVar(&f.Help, "help", false, "Show help")
-	flag.BoolVar(&f.Version, "version", false, "Show version")
-	flag.BoolVar(&f.Recursive, "r", false, "If this is set, tfmv finds files recursively")
+	flag.StringVarP(&f.Jsonnet, "jsonnet", "j", "", "Jsonnet file path")
+	flag.StringVarP(&f.Moved, "moved", "m", "moved.tf", "The destination file name")
+	flag.BoolVarP(&f.Help, "help", "h", false, "Show help")
+	flag.BoolVarP(&f.Version, "version", "v", false, "Show version")
+	flag.BoolVarP(&f.Recursive, "recursive", "r", false, "If this is set, tfmv finds files recursively")
 	flag.Parse()
 }
 
@@ -78,11 +78,11 @@ const help = `tfmv - Rename Terraform resources and modules and generate moved b
 https://github.com/suzuki-shunsuke/tfmv
 
 Usage:
-	tfmv [-help] [-version] [-file <Jsonnet file path>] [-r] [-dest <file name|same>] [file ...]
+	tfmv [--jsonnet <Jsonnet file path>] [--recursive] [--moved <file name|same>] [file ...]
 
 Options:
-	-help		Show help
-	-version	Show sort-issue-template version
-	-file		Jsonnet file path
-	-r			If this is set, tfmv finds files recursively
-	-dest		The destination file name. If this is "same", the file is same with the resource`
+	--help, -h			Show help
+	--version, -v		Show sort-issue-template version
+	--jsonnet, -j		Jsonnet file path
+	--recursive, -r		If this is set, tfmv finds files recursively
+	--moved, -m			The destination file name. If this is "same", the file is same with the resource`

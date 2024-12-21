@@ -36,11 +36,11 @@ tfmv.jsonnet:
 std.native("strings.Replace")(input.name, "-", "_", -1)
 ```
 
-Run `tfmv -file tfmv.jsonnet`.
+Run `tfmv -j tfmv.jsonnet`.
 You don't need to run `terraform init`.
 
 ```sh
-tfmv -file tfmv.jsonnet
+tfmv -j tfmv.jsonnet
 ```
 
 Then a resource name is changed and `moved.tf` is created.
@@ -66,22 +66,22 @@ moved {
 You can also pass *.tf via arguments:
 
 ```sh
-tfmv -file tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
+tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
 ```
 
 ### Change the filename for moved blocks
 
 By default tfmv writes moved blocks to `moved.tf`.
-You can change the file name via `-dest` option.
+You can change the file name via `-m` option.
 
 ```sh
-tfmv -file tfmv.jsonnet -dest moved_blocks.tf bar/main.tf
+tfmv -j tfmv.jsonnet -m moved_blocks.tf bar/main.tf
 ```
 
 You can also write moved blocks to the same file with renamed resources and modules.
 
 ```sh
-tfmv -file tfmv.jsonnet -dest same bar/foo.tf
+tfmv -j tfmv.jsonnet -m same bar/foo.tf
 ```
 
 ### `-r` Recursive option
@@ -90,7 +90,7 @@ By default, tfmv finds *.tf on the current directory.
 You can find files recursively using `-r` option.
 
 ```sh
-tfmv -r -file tfmv.jsonnet
+tfmv -r -j tfmv.jsonnet
 ```
 
 ## Jsonnet
