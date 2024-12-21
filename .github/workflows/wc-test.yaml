@@ -53,5 +53,5 @@ jobs:
 
       - run: tfmv -r -j tfmv.jsonnet
         working-directory: example
-      - run: diff foo/nest/main.tf foo/next/expected_main.tf
+      - run: diff foo/nest/main.tf foo/nest/expected_main.tf
         working-directory: example
