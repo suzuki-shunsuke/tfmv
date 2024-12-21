@@ -98,8 +98,11 @@ tfmv -r -j tfmv.jsonnet
 tfmv uses [Jsonnet](https://jsonnet.org) to enable you to define a custom rename logic.
 You need to define Jsonnet whose input is each resource and output is a new resource name.
 tfmv passes an input via External Variables.
-The Jsonnet must returns a new resource name.
-If the returned value is an empty string or not changed, the resource isn't renamed.
+You can access an input by `std.extVar('input')`.
+
+```jsonnet
+local input = std.extVar('input');
+```
 
 The type of an external variable `input` is as following:
 
@@ -112,6 +115,20 @@ The type of an external variable `input` is as following:
 }
 ```
 
+e.g.
+
+```json
+{
+  "file": "foo/main.tf",
+  "block_type": "resource",
+  "resource_type": "null_resource",
+  "name": "foo"
+}
+```
+
+The Jsonnet must returns a new resource name.
+If the returned value is an empty string or not changed, the resource isn't renamed.
+
 ### Native Functions
 
 tfmv supports the following [native functions](https://pkg.go.dev/github.com/google/go-jsonnet#NativeFunction).
@@ -121,7 +138,7 @@ You can executed these functions by `std.native("{native function name}")`.
 e.g.
 
 ```jsonnet
-local contained = std.native("strings.Contains")("hello", "ll"); // true
+std.native("strings.Replace")(input.name, "-", "_", -1)[0]
 ```
 
 For details, please see [Native functions](docs/native-function.md).
