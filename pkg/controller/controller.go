@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"io"
+	"regexp"
 
 	"github.com/spf13/afero"
 )
@@ -31,26 +32,104 @@ type Input struct {
 const wordResource = "resource"
 
 type Block struct {
-	File         string `json:"file"`
-	BlockType    string `json:"block_type"`
-	ResourceType string `json:"resource_type"`
-	Name         string `json:"name"`
+	File          string         `json:"file"`
+	BlockType     string         `json:"block_type"`
+	ResourceType  string         `json:"resource_type"`
+	Name          string         `json:"name"`
+	NewName       string         `json:"-"`
+	MovedFile     string         `json:"-"`
+	Regexp        *regexp.Regexp `json:"-"`
+	TFAddress     string         `json:"-"`
+	HCLAddress    string         `json:"-"`
+	NewTFAddress  string         `json:"-"`
+	NewHCLAddress string         `json:"-"`
 }
 
 func (b *Block) IsResource() bool {
 	return b.BlockType == wordResource
 }
 
-func (b *Block) Address() string {
-	if b.IsResource() {
-		return fmt.Sprintf("resource.%s.%s", b.ResourceType, b.Name)
-	}
-	return "module." + b.Name
-}
-
-func (b *Block) NewAddress(name string) string {
-	if b.IsResource() {
-		return fmt.Sprintf("resource.%s.%s", b.ResourceType, name)
+func hclAddress(blockType, resourceType, name string) string {
+	if blockType == wordResource {
+		return fmt.Sprintf("resource.%s.%s", resourceType, name)
 	}
 	return "module." + name
+}
+
+func tfAddress(blockType, resourceType, name string) string {
+	if blockType == wordResource {
+		return fmt.Sprintf("%s.%s", resourceType, name)
+	}
+	return "module." + name
+}
+
+func (b *Block) Regstr() string {
+	// A name must start with a letter or underscore and may contain only letters, digits, underscores, and dashes.
+	if b.IsResource() {
+		return fmt.Sprintf(`\b%s\.%s\b`, b.ResourceType, b.Name)
+	}
+	return fmt.Sprintf(`\bmodule\.%s\b`, b.Name)
+}
+
+type Dir struct {
+	Path   string
+	Files  []string
+	Blocks []*Block
+}
+
+type Fix struct {
+	Regexp     *regexp.Regexp
+	NewAddress string
+}
+
+func (b *Block) Fix(body string) string {
+	return b.Regexp.ReplaceAllString(body, b.NewTFAddress)
+}
+
+func applyFixes(body string, blocks []*Block) string {
+	for _, b := range blocks {
+		body = b.Fix(body)
+	}
+	return body
+}
+
+type RenamedBlock struct {
+	Dir        string
+	Address    string
+	NewAddress string
+}
+
+func (c *Controller) fixRef(dir *Dir) error {
+	for _, file := range dir.Files {
+		b, err := afero.ReadFile(c.fs, file)
+		if err != nil {
+			return err
+		}
+		s := applyFixes(string(b), dir.Blocks)
+		f, err := c.fs.Stat(file)
+		if err != nil {
+			return err
+		}
+		if err := afero.WriteFile(c.fs, file, []byte(s), f.Mode()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (b *Block) SetNewName(newName string) {
+	b.NewName = newName
+	b.NewHCLAddress = hclAddress(b.BlockType, b.ResourceType, newName)
+	b.NewTFAddress = tfAddress(b.BlockType, b.ResourceType, newName)
+}
+
+func (b *Block) Init() error {
+	b.TFAddress = tfAddress(b.BlockType, b.ResourceType, b.Name)
+	b.HCLAddress = hclAddress(b.BlockType, b.ResourceType, b.Name)
+	reg, err := regexp.Compile(b.Regstr())
+	if err != nil {
+		return err
+	}
+	b.Regexp = reg
+	return nil
 }
