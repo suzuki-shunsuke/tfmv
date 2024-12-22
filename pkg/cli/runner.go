@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -50,6 +51,17 @@ func (r *Runner) Run(ctx context.Context) error {
 			return errors.New("--moved name must be either 'same' or a file name with the suffix .tf")
 		}
 	}
+
+	include, err := getRegexFilter(flg.Include)
+	if err != nil {
+		return fmt.Errorf("--include is an invalid regular expression: %w", err)
+	}
+
+	exclude, err := getRegexFilter(flg.Exclude)
+	if err != nil {
+		return fmt.Errorf("--exclude is an invalid regular expression: %w", err)
+	}
+
 	ctrl := &controller.Controller{}
 	ctrl.Init(afero.NewOsFs(), r.Stdout, r.Stderr)
 	return ctrl.Run(ctx, r.LogE, &controller.Input{ //nolint:wrapcheck
@@ -59,7 +71,16 @@ func (r *Runner) Run(ctx context.Context) error {
 		DryRun:    flg.DryRun,
 		Args:      flg.Args,
 		Replace:   flg.Replace,
+		Include:   include,
+		Exclude:   exclude,
 	})
+}
+
+func getRegexFilter(s string) (*regexp.Regexp, error) {
+	if s == "" {
+		return nil, nil //nolint:nilnil
+	}
+	return regexp.Compile(s) //nolint:wrapcheck
 }
 
 type Flag struct {
@@ -68,6 +89,8 @@ type Flag struct {
 	LogLevel  string
 	LogColor  string
 	Replace   string
+	Include   string
+	Exclude   string
 	Args      []string
 	Help      bool
 	Version   bool
@@ -79,6 +102,8 @@ func parseFlags(f *Flag) {
 	flag.StringVarP(&f.Jsonnet, "jsonnet", "j", "", "Jsonnet file path")
 	flag.StringVarP(&f.Moved, "moved", "m", "moved.tf", "The destination file name")
 	flag.StringVarP(&f.Replace, "replace", "r", "", "Replace strings in block names. The format is <new>/<old>. e.g. -/_")
+	flag.StringVar(&f.Include, "include", "", "A regular expression to filter resources")
+	flag.StringVar(&f.Exclude, "exclude", "", "A regular expression to filter resources")
 	flag.StringVar(&f.LogLevel, "log-level", "info", "The log level")
 	flag.StringVar(&f.LogColor, "log-color", "auto", "The log color")
 	flag.BoolVarP(&f.Help, "help", "h", false, "Show help")
@@ -101,6 +126,8 @@ Options:
 	--jsonnet, -j    Jsonnet file path
 	--recursive, -R  If this is set, tfmv finds files recursively
 	--replace, -r    Replace strings in block names. The format is <new>/<old>. e.g. -/_
+	--include        A regular expression to filter resources. Only resources that match the regular expression are renamed
+	--exclude        A regular expression to filter resources. Only resources that don't match the regular expression are renamed
 	--dry-run        Dry Run
 	--log-level      Log level
 	--log-color      Log color. "auto", "always", "never" are available

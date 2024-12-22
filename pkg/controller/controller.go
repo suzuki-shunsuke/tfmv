@@ -2,6 +2,7 @@ package controller
 
 import (
 	"io"
+	"regexp"
 
 	"github.com/spf13/afero"
 )
@@ -22,6 +23,8 @@ type Input struct {
 	File      string
 	Dest      string
 	Replace   string
+	Include   *regexp.Regexp
+	Exclude   *regexp.Regexp
 	Args      []string
 	Recursive bool
 	DryRun    bool

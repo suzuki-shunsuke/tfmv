@@ -92,7 +92,7 @@ func (c *Controller) handleFile(logE *logrus.Entry, renamer Renamer, input *Inpu
 	}
 	// parse *.tf
 	logE.Debug("parsing a tf file")
-	blocks, err := parse(b, file)
+	blocks, err := parse(b, file, input.Include, input.Exclude)
 	if err != nil {
 		return nil, fmt.Errorf("parse a HCL file: %w", err)
 	}
