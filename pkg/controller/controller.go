@@ -42,6 +42,7 @@ type Summary struct {
 }
 
 func (s *Summary) FromDirs(dirs map[string]*Dir) {
+	s.Changes = []*Change{}
 	for _, dir := range dirs {
 		for _, block := range dir.Blocks {
 			s.Changes = append(s.Changes, &Change{
