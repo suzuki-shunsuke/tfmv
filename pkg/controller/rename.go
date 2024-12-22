@@ -1,46 +1,41 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
-	"io"
+	"strings"
 
-	"github.com/minamijoyo/hcledit/editor"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 )
 
-type Editor struct {
-	stderr io.Writer
-	dryRun bool
+type Renamer interface {
+	Rename(block *Block) (string, error)
 }
 
-type MoveBlockOpt struct {
-	// From is a source address.
-	From string
-	// To is a new address.
-	To       string
-	FilePath string
-	Stdin    io.Reader
-	Stdout   io.Writer
-	// If `Update` is true, the Terraform Configuration is updated in-place.
-	Update bool
+type ReplaceRenamer struct {
+	old string
+	new string
 }
 
-func (e *Editor) Move(logE *logrus.Entry, opt *MoveBlockOpt) error {
-	filter := editor.NewBlockRenameFilter(opt.From, opt.To)
-	cl := editor.NewClient(&editor.Option{
-		InStream:  opt.Stdin,
-		OutStream: opt.Stdout,
-		ErrStream: e.stderr,
-	})
-
-	if e.dryRun {
-		logE.Info("[DRY RUN] move a block")
-		return nil
+func NewReplaceRenamer(s string) (*ReplaceRenamer, error) {
+	o, n, ok := strings.Cut(s, "/")
+	if !ok {
+		return nil, fmt.Errorf("--repace must include /: %s", s)
 	}
-	logE.Info("moving a block")
+	return &ReplaceRenamer{old: o, new: n}, nil
+}
 
-	if err := cl.Edit(opt.FilePath, opt.Update, filter); err != nil {
-		return fmt.Errorf("move a block in %s from %s to %s: %w", opt.FilePath, opt.From, opt.To, err)
+func (r *ReplaceRenamer) Rename(block *Block) (string, error) {
+	return strings.ReplaceAll(block.Name, r.old, r.new), nil
+}
+
+func NewRenamer(logE *logrus.Entry, fs afero.Fs, input *Input) (Renamer, error) {
+	if input.Replace != "" {
+		return NewReplaceRenamer(input.Replace)
 	}
-	return nil
+	if input.File != "" {
+		return NewJsonnetRenamer(logE, fs, input.File)
+	}
+	return nil, errors.New("either --jsonnet or --replace must be specified")
 }
