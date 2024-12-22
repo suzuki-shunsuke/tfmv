@@ -31,15 +31,15 @@ resource "github_branch" "example" {
 ```
 
 Let's replace `-` with `_`.
-You need to specify either `--replace` or `--jsonnet (-j)`.
-In this case, let's use `--replace`.
+You need to specify either `-r` or `--jsonnet (-j)`.
+In this case, let's use `-r`.
 [If you need more flexible renaming, you can use Jsonnet. For details, please see here](#jsonnet).
 
-Run `tfmv --replace "-/_"`.
+Run `tfmv -r "-/_"`.
 You don't need to run `terraform init`.
 
 ```sh
-tfmv --replace "-/_"
+tfmv -r "-/_"
 ```
 
 Then a resource name is changed and `moved.tf` is created.
@@ -83,13 +83,13 @@ moved {
 You can also pass *.tf via arguments:
 
 ```sh
-tfmv --replace "-/_" foo/aws_s3_bucket.tf foo/aws_instance.tf
+tfmv -r "-/_" foo/aws_s3_bucket.tf foo/aws_instance.tf
 ```
 
 tfmv supports modules too.
 
 ```sh
-tfmv --replace "production/prod" foo/module_foo.tf
+tfmv -r "production/prod" foo/module_foo.tf
 ```
 
 ### Dry Run: --dry-run
@@ -97,7 +97,7 @@ tfmv --replace "production/prod" foo/module_foo.tf
 With `--dry-run`, tfmv outputs logs but doesn't rename blocks.
 
 ```sh
-tfmv --replace "-/_" --dry-run bar/main.tf
+tfmv -r "-/_" --dry-run bar/main.tf
 ```
 
 ### Change the filename for moved blocks
@@ -106,22 +106,22 @@ By default tfmv writes moved blocks to `moved.tf`.
 You can change the file name via `-m` option.
 
 ```sh
-tfmv --replace "-/_" -m moved_blocks.tf bar/main.tf
+tfmv -r "-/_" -m moved_blocks.tf bar/main.tf
 ```
 
 You can also write moved blocks to the same file with renamed resources and modules.
 
 ```sh
-tfmv --replace "-/_" -m same bar/foo.tf
+tfmv -r "-/_" -m same bar/foo.tf
 ```
 
-### `-r` Recursive option
+### `--recursive (-R)` Recursive option
 
 By default, tfmv finds *.tf on the current directory.
-You can find files recursively using `-r` option.
+You can find files recursively using `-R` option.
 
 ```sh
-tfmv -r --replace "-/_"
+tfmv -Rr "-/_"
 ```
 
 The following directories are ignored:
@@ -132,7 +132,7 @@ The following directories are ignored:
 
 ## Jsonnet
 
-`--replace` is simple and useful, but sometimes you need more flexible renaming.
+`-r` is simple and useful, but sometimes you need more flexible renaming.
 In that case, you can use `--jsonnet (-j)`.
 [Jsonnet](https://jsonnet.org) is a powerful data configuration language.
 
