@@ -24,6 +24,7 @@ type Input struct {
 	Dest      string
 	Replace   string
 	Include   *regexp.Regexp
+	Exclude   *regexp.Regexp
 	Args      []string
 	Recursive bool
 	DryRun    bool

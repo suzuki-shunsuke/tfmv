@@ -108,6 +108,12 @@ With `--include <regular expression>`, only resources matching the regular expre
 tfmv -r "-/_" --include "^aws_" bar/main.tf
 ```
 
+With `--exclude <regular expression>`, only resources not matching the regular expression are renamed.
+
+```sh
+tfmv -r "-/_" --exclude "^null_resource" bar/main.tf
+```
+
 ### Change the filename for moved blocks
 
 By default tfmv writes moved blocks to `moved.tf`.
