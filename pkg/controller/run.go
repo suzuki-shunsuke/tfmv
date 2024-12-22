@@ -82,16 +82,23 @@ func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) er
 		dir.Blocks = append(dir.Blocks, blocks...)
 	}
 	for _, dir := range dirs {
-		// fix references
-		if err := c.fixRef(dir); err != nil {
+		if err := c.handleDir(logE, editor, input, dir); err != nil {
 			return err
 		}
-		for _, block := range dir.Blocks {
-			// change resource addressses by hcledit
-			// generate moved blocks
-			if err := c.handleBlock(logE, editor, input, block); err != nil {
-				return err
-			}
+	}
+	return nil
+}
+
+func (c *Controller) handleDir(logE *logrus.Entry, editor *Editor, input *Input, dir *Dir) error {
+	// fix references
+	if err := c.fixRef(dir); err != nil {
+		return err
+	}
+	for _, block := range dir.Blocks {
+		// change resource addressses by hcledit
+		// generate moved blocks
+		if err := c.handleBlock(logE, editor, input, block); err != nil {
+			return err
 		}
 	}
 	return nil

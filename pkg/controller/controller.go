@@ -5,7 +5,9 @@ import (
 	"io"
 	"regexp"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"github.com/suzuki-shunsuke/logrus-error/logerr"
 )
 
 type Controller struct {
@@ -101,17 +103,18 @@ type RenamedBlock struct {
 
 func (c *Controller) fixRef(dir *Dir) error {
 	for _, file := range dir.Files {
+		fields := logrus.Fields{"file": file}
 		b, err := afero.ReadFile(c.fs, file)
 		if err != nil {
-			return err
+			return fmt.Errorf("read a file: %w", logerr.WithFields(err, fields))
 		}
 		s := applyFixes(string(b), dir.Blocks)
 		f, err := c.fs.Stat(file)
 		if err != nil {
-			return err
+			return fmt.Errorf("get a file stat: %w", logerr.WithFields(err, fields))
 		}
 		if err := afero.WriteFile(c.fs, file, []byte(s), f.Mode()); err != nil {
-			return err
+			return fmt.Errorf("write a file: %w", logerr.WithFields(err, fields))
 		}
 	}
 	return nil
@@ -128,7 +131,7 @@ func (b *Block) Init() error {
 	b.HCLAddress = hclAddress(b.BlockType, b.ResourceType, b.Name)
 	reg, err := regexp.Compile(b.Regstr())
 	if err != nil {
-		return err
+		return fmt.Errorf("compile a regular expression to capture a resource reference: %w", err)
 	}
 	b.Regexp = reg
 	return nil
