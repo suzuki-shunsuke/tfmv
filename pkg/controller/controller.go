@@ -23,6 +23,7 @@ type Input struct {
 	File      string
 	Dest      string
 	Replace   string
+	Regexp    string
 	Include   *regexp.Regexp
 	Exclude   *regexp.Regexp
 	Args      []string

@@ -100,6 +100,19 @@ With `--dry-run`, tfmv outputs logs but doesn't rename blocks.
 tfmv -r "-/_" --dry-run bar/main.tf
 ```
 
+### Rename resources by regular expression
+
+With `--regexp`, tfmv renames resources by regular expression.
+
+```sh
+tfmv --regexp '^example-(\d+)/test-$1' regexp/main.tf
+```
+
+About regular expression, please see the following document:
+
+- https://golang.org/s/re2syntax
+- https://pkg.go.dev/regexp#Regexp.ReplaceAllString
+
 ### Filter resources by regular expression
 
 With `--include <regular expression>`, only resources matching the regular expression are renamed.

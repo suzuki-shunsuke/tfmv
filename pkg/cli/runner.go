@@ -73,6 +73,7 @@ func (r *Runner) Run(ctx context.Context) error {
 		Replace:   flg.Replace,
 		Include:   include,
 		Exclude:   exclude,
+		Regexp:    flg.Regexp,
 	})
 }
 
@@ -89,6 +90,7 @@ type Flag struct {
 	LogLevel  string
 	LogColor  string
 	Replace   string
+	Regexp    string
 	Include   string
 	Exclude   string
 	Args      []string
@@ -101,7 +103,8 @@ type Flag struct {
 func parseFlags(f *Flag) {
 	flag.StringVarP(&f.Jsonnet, "jsonnet", "j", "", "Jsonnet file path")
 	flag.StringVarP(&f.Moved, "moved", "m", "moved.tf", "The destination file name")
-	flag.StringVarP(&f.Replace, "replace", "r", "", "Replace strings in block names. The format is <new>/<old>. e.g. -/_")
+	flag.StringVarP(&f.Replace, "replace", "r", "", "Replace strings in block names. The format is <old>/<new>. e.g. -/_")
+	flag.StringVar(&f.Regexp, "regexp", "", "Replace strings in block names by regular expression. The format is <regular expression>/<new>. e.g. '\bfoo\b/bar'")
 	flag.StringVar(&f.Include, "include", "", "A regular expression to filter resources")
 	flag.StringVar(&f.Exclude, "exclude", "", "A regular expression to filter resources")
 	flag.StringVar(&f.LogLevel, "log-level", "info", "The log level")
@@ -118,17 +121,20 @@ const help = `tfmv - Rename Terraform resources and modules and generate moved b
 https://github.com/suzuki-shunsuke/tfmv
 
 Usage:
-	tfmv [--jsonnet <Jsonnet file path>] [--recursive] [--moved <file name|same>] [file ...]
+	tfmv [<options>] [file ...]
+
+One of --jsonnet (-j), --replace (-r), or --regexp must be specified.
 
 Options:
 	--help, -h       Show help
 	--version, -v    Show sort-issue-template version
+	--replace, -r    Replace strings in block names. The format is <old>/<new>. e.g. -/_
 	--jsonnet, -j    Jsonnet file path
+	--regexp         Replace strings in block names by regular expression. The format is <regular expression>/<new>. e.g. '\bfoo\b/bar'
 	--recursive, -R  If this is set, tfmv finds files recursively
-	--replace, -r    Replace strings in block names. The format is <new>/<old>. e.g. -/_
 	--include        A regular expression to filter resources. Only resources that match the regular expression are renamed
 	--exclude        A regular expression to filter resources. Only resources that don't match the regular expression are renamed
 	--dry-run        Dry Run
 	--log-level      Log level
 	--log-color      Log color. "auto", "always", "never" are available
-	--moved, -m      The destination file name. If this is "same", the file is same with the resource`
+	--moved, -m      A file name where moved blocks are written. If this is "same", the file is same with renamed resources`
