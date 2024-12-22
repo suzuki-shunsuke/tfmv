@@ -17,7 +17,17 @@ cd tfmv/example
 main.tf:
 
 ```tf
-resource "null_resource" "foo-prod" {}
+resource "github_repository" "example-1" {
+  name = "example-1"
+}
+
+resource "github_branch" "example" {
+  repository = github_repository.example-1.name
+  branch     = "example"
+  depends_on = [
+    github_repository.example-1
+  ]
+}
 ```
 
 Let's replace `-` with `_`.
@@ -37,16 +47,34 @@ By default, tfmv finds *.tf on the current directory.
 
 main.tf:
 
-```tf
-resource "null_resource" "foo_prod" {}
+```diff
+diff --git a/example/main.tf b/example/main.tf
+index 48ce91d..e618ab1 100644
+--- a/example/main.tf
++++ b/example/main.tf
+@@ -1,11 +1,11 @@
+-resource "github_repository" "example-1" {
++resource "github_repository" "example_1" {
+   name = "example-1"
+ }
+ 
+ resource "github_branch" "example" {
+-  repository = github_repository.example-1.name
++  repository = github_repository.example_1.name
+   branch     = "example"
+   depends_on = [
+-    github_repository.example-1
++    github_repository.example_1
+   ]
+ }
 ```
 
 moved.tf:
 
 ```tf
 moved {
-  from = "null_resource.foo-prod"
-  to   = "null_resource.foo_prod"
+  from = github_repository.example-1
+  to   = github_repository.example_1
 }
 ```
 
