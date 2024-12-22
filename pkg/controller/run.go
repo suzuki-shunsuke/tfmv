@@ -64,12 +64,10 @@ func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) er
 func (c *Controller) summarize(dirs map[string]*Dir) error {
 	summary := &Summary{}
 	summary.FromDirs(dirs)
-	if len(summary.Changes) != 0 {
-		encoder := json.NewEncoder(c.stdout)
-		encoder.SetIndent("", "  ")
-		if err := encoder.Encode(summary); err != nil {
-			return fmt.Errorf("encode a summary as JSON: %w", err)
-		}
+	encoder := json.NewEncoder(c.stdout)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(summary); err != nil {
+		return fmt.Errorf("encode a summary as JSON: %w", err)
 	}
 	return nil
 }
