@@ -34,6 +34,9 @@ func parse(src []byte, filePath string) ([]*Block, error) {
 		default:
 			continue
 		}
+		if err := b.Init(); err != nil {
+			return nil, err
+		}
 		blocks = append(blocks, b)
 	}
 	return blocks, nil

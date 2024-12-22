@@ -64,32 +64,76 @@ func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) er
 		stderr: c.stderr,
 		dryRun: input.DryRun,
 	}
+	dirs := map[string]*Dir{}
 	for _, file := range files {
 		logE := logE.WithField("file", file)
 		logE.Debug("handling a file")
-		if err := c.handleFile(logE, editor, renamer, input, file); err != nil {
+		dirPath := filepath.Dir(file)
+		dir, ok := dirs[dirPath]
+		if !ok {
+			dir = &Dir{Path: dirPath}
+			dirs[dirPath] = dir
+		}
+		dir.Files = append(dir.Files, file)
+		blocks, err := c.handleFile(logE, renamer, input, file)
+		if err != nil {
 			return fmt.Errorf("handle a file: %w", err)
+		}
+		dir.Blocks = append(dir.Blocks, blocks...)
+	}
+	for _, dir := range dirs {
+		if err := c.handleDir(logE, editor, input, dir); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-func (c *Controller) handleFile(logE *logrus.Entry, editor *Editor, renamer Renamer, input *Input, file string) error {
+func (c *Controller) handleDir(logE *logrus.Entry, editor *Editor, input *Input, dir *Dir) error {
+	// fix references
+	if err := c.fixRef(logE, dir); err != nil {
+		return err
+	}
+	for _, block := range dir.Blocks {
+		// change resource addressses by hcledit
+		// generate moved blocks
+		logE := logE.WithFields(logrus.Fields{
+			"address":     block.TFAddress,
+			"new_address": block.NewTFAddress,
+			"file":        block.File,
+		})
+		if err := c.handleBlock(logE, editor, input, block); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getMovedFile(file, dest string) string {
+	if dest == "same" {
+		dest = filepath.Base(file)
+	}
+	return filepath.Join(filepath.Dir(file), dest)
+}
+
+func (c *Controller) handleFile(logE *logrus.Entry, renamer Renamer, input *Input, file string) ([]*Block, error) {
 	logE.Debug("reading a tf file")
 	b, err := afero.ReadFile(c.fs, file)
 	if err != nil {
-		return fmt.Errorf("read a file: %w", err)
+		return nil, fmt.Errorf("read a file: %w", err)
 	}
 	// parse *.tf
 	logE.Debug("parsing a tf file")
 	blocks, err := parse(b, file)
 	if err != nil {
-		return fmt.Errorf("parse a HCL file: %w", err)
+		return nil, fmt.Errorf("parse a HCL file: %w", err)
 	}
 	if len(blocks) == 0 {
 		logE.Debug("no resource or module block is found")
-		return nil
+		return nil, nil
 	}
+	arr := []*Block{}
+	movedFile := getMovedFile(file, input.Dest)
 	for _, block := range blocks {
 		logE := logE.WithFields(logrus.Fields{
 			"block_type":    block.BlockType,
@@ -97,44 +141,36 @@ func (c *Controller) handleFile(logE *logrus.Entry, editor *Editor, renamer Rena
 			"name":          block.Name,
 		})
 		logE.Debug("handling a block")
-		if err := c.handleBlock(logE, editor, renamer, input, file, block); err != nil {
-			return fmt.Errorf("handle a block: %w", err)
+		block.MovedFile = movedFile
+		newName, err := renamer.Rename(block)
+		if err != nil {
+			return nil, fmt.Errorf("get a new name: %w", err)
 		}
+		if newName == "" || newName == block.Name {
+			continue
+		}
+		block.SetNewName(newName)
+		arr = append(arr, block)
 	}
-	return nil
+	return arr, nil
 }
 
-func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, renamer Renamer, input *Input, file string, block *Block) error {
-	// evaluate Jsonnet
-	dest, err := renamer.Rename(block)
-	if err != nil {
-		return fmt.Errorf("evaluate Jsonnet: %w", err)
-	}
-	logE.WithField("new_name", dest).Debug("evaluate Jsonnet")
-	if dest == "" || dest == block.Name {
-		return nil
-	}
+func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, input *Input, block *Block) error {
 	// generate moved blocks
-	fileName := input.Dest
-	if fileName == "same" {
-		fileName = filepath.Base(block.File)
-	}
-	movedFile := filepath.Join(filepath.Dir(block.File), fileName)
-	logE.WithField("moved_file", movedFile).Debug("generating a moved block")
 	if input.DryRun {
-		logE.WithField("moved_file", movedFile).Info("[DRY RUN] generate a moved block")
+		logE.WithField("moved_file", block.MovedFile).Info("[DRY RUN] generate a moved block")
 	} else {
-		if err := c.writeMovedBlock(block, dest, movedFile); err != nil {
+		logE.WithField("moved_file", block.MovedFile).Info("writing a moved block")
+		if err := c.writeMovedBlock(block, block.NewName, block.MovedFile); err != nil {
 			return fmt.Errorf("write a moved block: %w", err)
 		}
 	}
 
 	// rename resources
-	logE.Debug("moving a block")
 	if err := editor.Move(logE, &MoveBlockOpt{
-		From:     block.Address(),
-		To:       block.NewAddress(dest),
-		FilePath: file,
+		From:     block.HCLAddress,
+		To:       block.NewHCLAddress,
+		FilePath: block.File,
 		Update:   true,
 	}); err != nil {
 		return fmt.Errorf("move a block: %w", err)

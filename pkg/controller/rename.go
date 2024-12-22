@@ -37,7 +37,7 @@ func (e *Editor) Move(logE *logrus.Entry, opt *MoveBlockOpt) error {
 		logE.Info("[DRY RUN] move a block")
 		return nil
 	}
-	logE.Info("move a block")
+	logE.Info("moving a block")
 
 	if err := cl.Edit(opt.FilePath, opt.Update, filter); err != nil {
 		return fmt.Errorf("move a block in %s from %s to %s: %w", opt.FilePath, opt.From, opt.To, err)
