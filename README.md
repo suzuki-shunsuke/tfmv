@@ -100,6 +100,14 @@ With `--dry-run`, tfmv outputs logs but doesn't rename blocks.
 tfmv -r "-/_" --dry-run bar/main.tf
 ```
 
+### Rename resources by regular expression
+
+With `--regexp`, tfmv renames resources by regular expression.
+
+```sh
+tfmv --regexp '\bfoo\b/bar' --dry-run bar/main.tf
+```
+
 ### Filter resources by regular expression
 
 With `--include <regular expression>`, only resources matching the regular expression are renamed.
