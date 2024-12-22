@@ -36,3 +36,25 @@ type Dir struct {
 	Files  []string
 	Blocks []*Block
 }
+
+type Summary struct {
+	Changes []*Change `json:"changes"`
+}
+
+func (s *Summary) FromDirs(dirs map[string]*Dir) {
+	for _, dir := range dirs {
+		for _, block := range dir.Blocks {
+			s.Changes = append(s.Changes, &Change{
+				Dir:        dir.Path,
+				Address:    block.TFAddress,
+				NewAddress: block.NewTFAddress,
+			})
+		}
+	}
+}
+
+type Change struct {
+	Dir        string `json:"dir"`
+	Address    string `json:"address"`
+	NewAddress string `json:"new_address"`
+}

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 
@@ -49,9 +50,25 @@ func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) er
 		}
 		dir.Blocks = append(dir.Blocks, blocks...)
 	}
+	if err := c.summarize(dirs); err != nil {
+		logerr.WithError(logE, err).Warn("output changed summary")
+	}
 	for _, dir := range dirs {
 		if err := c.handleDir(logE, editor, input, dir); err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func (c *Controller) summarize(dirs map[string]*Dir) error {
+	summary := &Summary{}
+	summary.FromDirs(dirs)
+	if len(summary.Changes) != 0 {
+		encoder := json.NewEncoder(c.stdout)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(summary); err != nil {
+			return fmt.Errorf("encode a summary as JSON: %w", err)
 		}
 	}
 	return nil
