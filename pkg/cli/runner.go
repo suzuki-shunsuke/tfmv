@@ -70,9 +70,9 @@ func (r *Runner) Run(ctx context.Context) error {
 
 func getRegexFilter(s string) (*regexp.Regexp, error) {
 	if s == "" {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
-	return regexp.Compile(s)
+	return regexp.Compile(s) //nolint:wrapcheck
 }
 
 type Flag struct {
