@@ -2,12 +2,13 @@ package controller
 
 import (
 	"errors"
+	"regexp"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 )
 
-func parse(src []byte, filePath string) ([]*Block, error) {
+func parse(src []byte, filePath string, include *regexp.Regexp) ([]*Block, error) {
 	file, diags := hclsyntax.ParseConfig(src, filePath, hcl.Pos{Byte: 0, Line: 1, Column: 1})
 	if diags.HasErrors() {
 		return nil, diags
@@ -36,6 +37,9 @@ func parse(src []byte, filePath string) ([]*Block, error) {
 		}
 		if err := b.Init(); err != nil {
 			return nil, err
+		}
+		if include != nil && !include.MatchString(b.TFAddress) {
+			continue
 		}
 		blocks = append(blocks, b)
 	}
