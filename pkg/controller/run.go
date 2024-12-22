@@ -91,12 +91,17 @@ func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) er
 
 func (c *Controller) handleDir(logE *logrus.Entry, editor *Editor, input *Input, dir *Dir) error {
 	// fix references
-	if err := c.fixRef(dir); err != nil {
+	if err := c.fixRef(logE, dir); err != nil {
 		return err
 	}
 	for _, block := range dir.Blocks {
 		// change resource addressses by hcledit
 		// generate moved blocks
+		logE := logE.WithFields(logrus.Fields{
+			"address":     block.TFAddress,
+			"new_address": block.NewTFAddress,
+			"file":        block.File,
+		})
 		if err := c.handleBlock(logE, editor, input, block); err != nil {
 			return err
 		}
@@ -152,17 +157,16 @@ func (c *Controller) handleFile(logE *logrus.Entry, renamer Renamer, input *Inpu
 
 func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, input *Input, block *Block) error {
 	// generate moved blocks
-	logE.WithField("moved_file", block.MovedFile).Debug("generating a moved block")
 	if input.DryRun {
 		logE.WithField("moved_file", block.MovedFile).Info("[DRY RUN] generate a moved block")
 	} else {
+		logE.WithField("moved_file", block.MovedFile).Info("writing a moved block")
 		if err := c.writeMovedBlock(block, block.NewName, block.MovedFile); err != nil {
 			return fmt.Errorf("write a moved block: %w", err)
 		}
 	}
 
 	// rename resources
-	logE.Debug("moving a block")
 	if err := editor.Move(logE, &MoveBlockOpt{
 		From:     block.HCLAddress,
 		To:       block.NewHCLAddress,

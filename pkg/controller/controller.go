@@ -101,18 +101,23 @@ type RenamedBlock struct {
 	NewAddress string
 }
 
-func (c *Controller) fixRef(dir *Dir) error {
+func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir) error {
 	for _, file := range dir.Files {
 		fields := logrus.Fields{"file": file}
 		b, err := afero.ReadFile(c.fs, file)
 		if err != nil {
 			return fmt.Errorf("read a file: %w", logerr.WithFields(err, fields))
 		}
-		s := applyFixes(string(b), dir.Blocks)
+		orig := string(b)
+		s := applyFixes(orig, dir.Blocks)
+		if orig == s {
+			continue
+		}
 		f, err := c.fs.Stat(file)
 		if err != nil {
 			return fmt.Errorf("get a file stat: %w", logerr.WithFields(err, fields))
 		}
+		logE.WithFields(fields).Info("fixing references")
 		if err := afero.WriteFile(c.fs, file, []byte(s), f.Mode()); err != nil {
 			return fmt.Errorf("write a file: %w", logerr.WithFields(err, fields))
 		}
