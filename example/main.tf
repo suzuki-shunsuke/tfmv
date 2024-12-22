@@ -1,5 +1,3 @@
-resource "null_resource" "foo_prod" {}
-
 resource "github_repository" "example-1" {
   name = "example-1"
 }
