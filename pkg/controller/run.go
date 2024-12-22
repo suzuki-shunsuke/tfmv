@@ -74,7 +74,7 @@ func (c *Controller) summarize(dirs map[string]*Dir) error {
 
 func (c *Controller) handleDir(logE *logrus.Entry, editor *Editor, input *Input, dir *Dir) error {
 	// fix references
-	if err := c.fixRef(logE, dir, input.DryRun); err != nil {
+	if err := c.fixRef(logE, dir, input); err != nil {
 		return err
 	}
 	for _, block := range dir.Blocks {
@@ -168,8 +168,16 @@ func applyFixes(body string, blocks []*Block) string {
 	return body
 }
 
-func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir, dryRun bool) error {
-	for _, file := range dir.Files {
+func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir, input *Input) error {
+	files := dir.Files
+	if len(input.Args) != 0 {
+		arr, err := afero.Glob(c.fs, filepath.Join(dir.Path, "*.tf"))
+		if err != nil {
+			return fmt.Errorf("find a file: %w", err)
+		}
+		files = arr
+	}
+	for _, file := range files {
 		fields := logrus.Fields{"file": file}
 		b, err := afero.ReadFile(c.fs, file)
 		if err != nil {
@@ -184,7 +192,7 @@ func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir, dryRun bool) error {
 		if err != nil {
 			return fmt.Errorf("get a file stat: %w", logerr.WithFields(err, fields))
 		}
-		if dryRun {
+		if input.DryRun {
 			logE.WithFields(fields).Info("[DRY RUN] fixing references")
 		} else {
 			logE.WithFields(fields).Info("fixing references")
