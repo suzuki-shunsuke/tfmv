@@ -2,45 +2,13 @@ package controller
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"github.com/suzuki-shunsuke/logrus-error/logerr"
 )
-
-type Renamer interface {
-	Rename(block *Block) (string, error)
-}
-
-type ReplaceRenamer struct {
-	old string
-	new string
-}
-
-func NewReplaceRenamer(s string) (*ReplaceRenamer, error) {
-	o, n, ok := strings.Cut(s, "/")
-	if !ok {
-		return nil, fmt.Errorf("--repace must include /: %s", s)
-	}
-	return &ReplaceRenamer{old: o, new: n}, nil
-}
-
-func (r *ReplaceRenamer) Rename(block *Block) (string, error) {
-	return strings.ReplaceAll(block.Name, r.old, r.new), nil
-}
-
-func NewRenamer(logE *logrus.Entry, fs afero.Fs, input *Input) (Renamer, error) {
-	if input.Replace != "" {
-		return NewReplaceRenamer(input.Replace)
-	}
-	if input.File != "" {
-		return NewJsonnetRenamer(logE, fs, input.File)
-	}
-	return nil, errors.New("either --jsonnet or --replace must be specified")
-}
 
 func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) error {
 	// read Jsonnet
@@ -174,6 +142,37 @@ func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, input *Inpu
 		Update:   true,
 	}); err != nil {
 		return fmt.Errorf("move a block: %w", err)
+	}
+	return nil
+}
+
+func applyFixes(body string, blocks []*Block) string {
+	for _, b := range blocks {
+		body = b.Fix(body)
+	}
+	return body
+}
+
+func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir) error {
+	for _, file := range dir.Files {
+		fields := logrus.Fields{"file": file}
+		b, err := afero.ReadFile(c.fs, file)
+		if err != nil {
+			return fmt.Errorf("read a file: %w", logerr.WithFields(err, fields))
+		}
+		orig := string(b)
+		s := applyFixes(orig, dir.Blocks)
+		if orig == s {
+			continue
+		}
+		f, err := c.fs.Stat(file)
+		if err != nil {
+			return fmt.Errorf("get a file stat: %w", logerr.WithFields(err, fields))
+		}
+		logE.WithFields(fields).Info("fixing references")
+		if err := afero.WriteFile(c.fs, file, []byte(s), f.Mode()); err != nil {
+			return fmt.Errorf("write a file: %w", logerr.WithFields(err, fields))
+		}
 	}
 	return nil
 }
