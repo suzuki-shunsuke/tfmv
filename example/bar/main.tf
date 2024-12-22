@@ -1,1 +1,3 @@
-resource "null_resource" "yoo-prod" {}
+resource "github_repository" "example-1" {
+  name = "example-1"
+}
