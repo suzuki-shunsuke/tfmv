@@ -29,29 +29,33 @@ jobs:
       - run: tfmv --version
       - run: tfmv --help
 
-      - run: tfmv --replace "-/_"
+      - run: tfmv -r "-/_"
         working-directory: example
       - run: diff main.tf expected_main.tf
         working-directory: example
 
-      - run: tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
+      - name: Test -j (--jsonnet)
+        run: tfmv -j tfmv.jsonnet foo/aws_s3_bucket.tf foo/aws_instance.tf
         working-directory: example
       - run: diff foo/aws_s3_bucket.tf foo/expected_aws_s3_bucket.tf
         working-directory: example
       - run: diff foo/aws_instance.tf foo/expected_aws_instance.tf
         working-directory: example
 
-      - run: tfmv -j tfmv.jsonnet -m moved_blocks.tf bar/main.tf
+      - name: Test -m
+        run: tfmv -j tfmv.jsonnet -m moved_blocks.tf bar/main.tf
         working-directory: example
       - run: diff bar/main.tf bar/expected_main.tf
         working-directory: example
 
-      - run: tfmv -j tfmv.jsonnet -m same bar/foo.tf
+      - name: Test -m same
+        run: tfmv -j tfmv.jsonnet -m same bar/foo.tf
         working-directory: example
       - run: diff bar/foo.tf bar/expected_foo.tf
         working-directory: example
 
-      - run: tfmv -r -j tfmv.jsonnet
+      - name: Test -R (--recursive)
+        run: tfmv -R -j tfmv.jsonnet
         working-directory: example
       - run: diff foo/nest/main.tf foo/nest/expected_main.tf
         working-directory: example
