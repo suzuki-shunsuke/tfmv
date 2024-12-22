@@ -164,8 +164,8 @@ func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, input *Inpu
 	// rename resources
 	logE.Debug("moving a block")
 	if err := editor.Move(logE, &MoveBlockOpt{
-		From:     block.TFAddress,
-		To:       block.NewTFAddress,
+		From:     block.HCLAddress,
+		To:       block.NewHCLAddress,
 		FilePath: block.File,
 		Update:   true,
 	}); err != nil {
