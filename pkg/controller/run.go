@@ -76,7 +76,7 @@ func (c *Controller) summarize(dirs map[string]*Dir) error {
 
 func (c *Controller) handleDir(logE *logrus.Entry, editor *Editor, input *Input, dir *Dir) error {
 	// fix references
-	if err := c.fixRef(logE, dir); err != nil {
+	if err := c.fixRef(logE, dir, input.DryRun); err != nil {
 		return err
 	}
 	for _, block := range dir.Blocks {
@@ -170,7 +170,7 @@ func applyFixes(body string, blocks []*Block) string {
 	return body
 }
 
-func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir) error {
+func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir, dryRun bool) error {
 	for _, file := range dir.Files {
 		fields := logrus.Fields{"file": file}
 		b, err := afero.ReadFile(c.fs, file)
@@ -186,9 +186,13 @@ func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir) error {
 		if err != nil {
 			return fmt.Errorf("get a file stat: %w", logerr.WithFields(err, fields))
 		}
-		logE.WithFields(fields).Info("fixing references")
-		if err := afero.WriteFile(c.fs, file, []byte(s), f.Mode()); err != nil {
-			return fmt.Errorf("write a file: %w", logerr.WithFields(err, fields))
+		if dryRun {
+			logE.WithFields(fields).Info("[DRY RUN] fixing references")
+		} else {
+			logE.WithFields(fields).Info("fixing references")
+			if err := afero.WriteFile(c.fs, file, []byte(s), f.Mode()); err != nil {
+				return fmt.Errorf("write a file: %w", logerr.WithFields(err, fields))
+			}
 		}
 	}
 	return nil
