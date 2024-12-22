@@ -24,7 +24,7 @@ func NewRenamer(logE *logrus.Entry, fs afero.Fs, input *Input) (Renamer, error) 
 	if input.Regexp != "" {
 		return NewRegexpRenamer(input.Regexp)
 	}
-	return nil, errors.New("One of --jsonnet or --replace or --regexp must be specified")
+	return nil, errors.New("one of --jsonnet or --replace or --regexp must be specified")
 }
 
 type ReplaceRenamer struct {
