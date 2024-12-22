@@ -105,8 +105,13 @@ tfmv -r "-/_" --dry-run bar/main.tf
 With `--regexp`, tfmv renames resources by regular expression.
 
 ```sh
-tfmv --regexp '\bfoo\b/bar' --dry-run bar/main.tf
+tfmv --regexp '^example-(\d+)/test-$1' regexp/main.tf
 ```
+
+About regular expression, please see the following document:
+
+- https://golang.org/s/re2syntax
+- https://pkg.go.dev/regexp#Regexp.ReplaceAllString
 
 ### Filter resources by regular expression
 
