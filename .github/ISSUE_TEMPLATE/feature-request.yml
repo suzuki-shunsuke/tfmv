@@ -1,0 +1,39 @@
+name: Feature Request
+description: Feature Request
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: feature-overview
+    attributes:
+      label: Feature Overview
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is the feature needed?
+      description: Please explain the problem you want to solve.
+    validations:
+      required: true
+  - type: textarea
+    id: example-code
+    attributes:
+      label: Example Code
+      description: |
+        Please explain the feature using code.
+        For example, if you want a new command line option, please explain the usage of the option.
+      value: |
+        ```console
+        $ 
+        ```
+
+        Expected result:
+    validations:
+      required: false
+  - type: textarea
+    id: note
+    attributes:
+      label: Note
+    validations:
+      required: false
