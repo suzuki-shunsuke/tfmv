@@ -31,7 +31,7 @@ func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*Blo
 	return blocks, nil
 }
 
-func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regexp.Regexp) (*Block, error) { //nolint:cyclop
+func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regexp.Regexp) (*Block, error) {
 	types := map[string]struct{}{
 		wordResource: {},
 		wordData:     {},
