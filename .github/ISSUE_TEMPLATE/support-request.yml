@@ -1,0 +1,71 @@
+name: Support Request
+description: |
+  Please use this template when you face any problem (not bug) and need our help.
+  If you're not sure if it's a bug or not, please use this template.
+labels:
+  - support-request
+body:
+  - type: textarea
+    id: info
+    attributes:
+      label: Version and OS
+      description: |
+        Please use the latest version.
+        If you checked multiple versions, please write the result too.
+        e.g. This issue occurs using tfmv v0.2.1 and v0.2.2, but doesn't occur using v0.2.0.
+      value: |
+        ```console
+        $ tfmv -v
+
+        ```
+
+        OS: 
+    validations:
+      required: true
+  - type: textarea
+    id: overview
+    attributes:
+      label: Overview
+    validations:
+      required: true
+  - type: textarea
+    id: how-to-reproduce
+    attributes:
+      label: How to reproduce
+      description: |
+        Please see [the guide](https://github.com/suzuki-shunsuke/oss-contribution-guide#write-good-how-to-reproduce) too.
+        Terraform Configuration should be not partial but complete configuration.
+        Please remove unnecessary configuration to reproduce the issue.
+        Please don't use private Modules and providers because they make it difficult to reproduce the issue.
+      value: |
+        Terraform Configuration:
+
+        ```tf
+
+        ```
+
+        Executed command and output:
+
+        ```console
+        $ 
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behaviour
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: note
+    attributes:
+      label: Note
+    validations:
+      required: false
