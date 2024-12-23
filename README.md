@@ -165,13 +165,7 @@ moved {
 You can also pass *.tf via arguments:
 
 ```sh
-tfmv -r "-/_" foo/aws_s3_bucket.tf foo/aws_instance.tf
-```
-
-tfmv supports modules too.
-
-```sh
-tfmv -r "production/prod" foo/module_foo.tf
+tfmv -r "-/_" main.tf
 ```
 
 ### Dry Run: --dry-run
@@ -179,15 +173,23 @@ tfmv -r "production/prod" foo/module_foo.tf
 With `--dry-run`, tfmv outputs logs but doesn't rename blocks.
 
 ```sh
-tfmv -r "-/_" --dry-run bar/main.tf
+tfmv -r "-/_" --dry-run main.tf
 ```
 
 ### Rename resources by regular expression
 
 With `--regexp`, tfmv renames resources by regular expression.
 
+e.g. Remove `-prod` suffix:
+
 ```sh
-tfmv --regexp '^example-(\d+)/test-$1' regexp/main.tf
+tfmv --regexp '-prod$/'
+```
+
+Inside repl, `$` signs are interpreted as in [Regexp.Expand](https://pkg.go.dev/regexp#Regexp.Expand).
+
+```sh
+tfmv --regexp '^example-(\d+)/test-$1' main.tf
 ```
 
 About regular expression, please see the following document:
@@ -199,14 +201,18 @@ About regular expression, please see the following document:
 
 With `--include <regular expression>`, only resources matching the regular expression are renamed.
 
+e.g. Rename only AWS resources:
+
 ```sh
-tfmv -r "-/_" --include "^aws_" bar/main.tf
+tfmv -r "-/_" --include "^aws_"
 ```
 
 With `--exclude <regular expression>`, only resources not matching the regular expression are renamed.
 
+e.g. Exclude AWS resources:
+
 ```sh
-tfmv -r "-/_" --exclude "^null_resource" bar/main.tf
+tfmv -r "-/_" --exclude "^aws_"
 ```
 
 ### Change the filename for moved blocks
@@ -215,13 +221,13 @@ By default tfmv writes moved blocks to `moved.tf`.
 You can change the file name via `-m` option.
 
 ```sh
-tfmv -r "-/_" -m moved_blocks.tf bar/main.tf
+tfmv -r "-/_" -m moved_blocks.tf
 ```
 
-You can also write moved blocks to the same file with renamed resources and modules.
+With `-m same`, moved blocks are outputted to the same file with rename resources.
 
 ```sh
-tfmv -r "-/_" -m same bar/foo.tf
+tfmv -r "-/_" -m same
 ```
 
 ### `--recursive (-R)` Recursive option
