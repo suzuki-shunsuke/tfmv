@@ -13,7 +13,7 @@ clean() {
 
 run_test() {
   for file in main.tf moved.tf; do
-    if diff "$file" "${file}.after"; then
+    if diff "$file" "${file}.after" >/dev/null; then
       echo "[ERROR] $file and ${file}.after is same before running tfmv" >&2
       return 1
     fi
@@ -25,6 +25,7 @@ run_test() {
     if diff "$file" "${file}.after"; then
       git checkout -- "$file"
     else
+      echo "[ERROR] $file and ${file}.after is different after running tfmv" >&2
       clean
       return 1
     fi
