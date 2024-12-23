@@ -35,7 +35,7 @@ type ReplaceRenamer struct {
 func NewReplaceRenamer(s string) (*ReplaceRenamer, error) {
 	o, n, ok := strings.Cut(s, "/")
 	if !ok {
-		return nil, fmt.Errorf("--repace must include /: %s", s)
+		return nil, fmt.Errorf("--replace must include /: %s", s)
 	}
 	return &ReplaceRenamer{old: o, new: n}, nil
 }

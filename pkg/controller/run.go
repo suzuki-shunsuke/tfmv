@@ -81,7 +81,7 @@ func (c *Controller) handleDir(logE *logrus.Entry, editor *Editor, input *Input,
 		return err
 	}
 	for _, block := range dir.Blocks {
-		// change resource addressses by hcledit
+		// change resource addresses by hcledit
 		// generate moved blocks
 		logE := logE.WithFields(logrus.Fields{
 			"address":     block.TFAddress,

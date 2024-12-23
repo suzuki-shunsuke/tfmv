@@ -1,0 +1,5 @@
+
+moved {
+  from = github_repository.example-1
+  to   = github_repository.example_1
+}

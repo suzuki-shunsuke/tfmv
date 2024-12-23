@@ -1,0 +1,10 @@
+
+moved {
+  from = github_repository.example-1
+  to   = github_repository.example_1
+}
+
+moved {
+  from = module.example-3
+  to   = module.example_3
+}

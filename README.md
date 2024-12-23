@@ -11,37 +11,15 @@ tfmv -r "-/_"
 ```
 
 ```diff
-diff --git a/example/main.tf b/example/main.tf
-index 48ef3bd..9110880 100644
---- a/example/main.tf
-+++ b/example/main.tf
-@@ -1,20 +1,20 @@
 -resource "github_repository" "example-1" {
 +resource "github_repository" "example_1" {
    name = "example-1"
  }
  
--data "github_branch" "example-2" {
+ data "github_branch" "example" {
 -  repository = github_repository.example-1.name
-+data "github_branch" "example_2" {
 +  repository = github_repository.example_1.name
    branch     = "example"
-   depends_on = [
--    github_repository.example-1,
--    module.example-3
-+    github_repository.example_1,
-+    module.example_3
-   ]
- }
- 
--module "example-3" {
-+module "example_3" {
-   source = "./foo/module"
- }
- 
- output "branch_sha" {
--  value = data.github_branch.example-2.sha
-+  value = data.github_branch.example_2.sha
  }
 ```
 
@@ -51,11 +29,6 @@ moved.tf is created:
 moved {
   from = github_repository.example-1
   to   = github_repository.example_1
-}
-
-moved {
-  from = module.example-3
-  to   = module.example_3
 }
 ```
 
@@ -165,13 +138,7 @@ moved {
 You can also pass *.tf via arguments:
 
 ```sh
-tfmv -r "-/_" foo/aws_s3_bucket.tf foo/aws_instance.tf
-```
-
-tfmv supports modules too.
-
-```sh
-tfmv -r "production/prod" foo/module_foo.tf
+tfmv -r "-/_" main.tf
 ```
 
 ### Dry Run: --dry-run
@@ -179,15 +146,23 @@ tfmv -r "production/prod" foo/module_foo.tf
 With `--dry-run`, tfmv outputs logs but doesn't rename blocks.
 
 ```sh
-tfmv -r "-/_" --dry-run bar/main.tf
+tfmv -r "-/_" --dry-run main.tf
 ```
 
 ### Rename resources by regular expression
 
 With `--regexp`, tfmv renames resources by regular expression.
 
+e.g. Remove `-prod` suffix:
+
 ```sh
-tfmv --regexp '^example-(\d+)/test-$1' regexp/main.tf
+tfmv --regexp '-prod$/'
+```
+
+Inside repl, `$` signs are interpreted as in [Regexp.Expand](https://pkg.go.dev/regexp#Regexp.Expand).
+
+```sh
+tfmv --regexp '^example-(\d+)/test-$1' main.tf
 ```
 
 About regular expression, please see the following document:
@@ -199,14 +174,18 @@ About regular expression, please see the following document:
 
 With `--include <regular expression>`, only resources matching the regular expression are renamed.
 
+e.g. Rename only AWS resources:
+
 ```sh
-tfmv -r "-/_" --include "^aws_" bar/main.tf
+tfmv -r "-/_" --include "^aws_"
 ```
 
 With `--exclude <regular expression>`, only resources not matching the regular expression are renamed.
 
+e.g. Exclude AWS resources:
+
 ```sh
-tfmv -r "-/_" --exclude "^null_resource" bar/main.tf
+tfmv -r "-/_" --exclude "^aws_"
 ```
 
 ### Change the filename for moved blocks
@@ -215,13 +194,13 @@ By default tfmv writes moved blocks to `moved.tf`.
 You can change the file name via `-m` option.
 
 ```sh
-tfmv -r "-/_" -m moved_blocks.tf bar/main.tf
+tfmv -r "-/_" -m moved_blocks.tf
 ```
 
-You can also write moved blocks to the same file with renamed resources and modules.
+With `-m same`, moved blocks are outputted to the same file with rename resources.
 
 ```sh
-tfmv -r "-/_" -m same bar/foo.tf
+tfmv -r "-/_" -m same
 ```
 
 ### `--recursive (-R)` Recursive option
