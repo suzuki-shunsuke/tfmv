@@ -76,7 +76,6 @@ func SetNativeFunctions(vm *jsonnet.VM) {
 		"strings.Repeat":       strings.Repeat,
 		"strings.Replace":      strings.Replace,
 		"strings.TrimPrefix":   strings.TrimPrefix,
-		"strings.TrimSpace":    strings.TrimSpace, //nolint:staticcheck
 		"url.Parse":            url.Parse,
 	}
 	for k, v := range m {

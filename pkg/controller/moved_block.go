@@ -8,6 +8,9 @@ import (
 )
 
 func (c *Controller) writeMovedBlock(block *Block, dest, movedFile string) error {
+	if block.BlockType == wordData {
+		return nil
+	}
 	file, err := c.fs.OpenFile(movedFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644) //nolint:mnd
 	if err != nil {
 		return fmt.Errorf("open a file: %w", err)
