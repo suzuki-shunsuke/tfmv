@@ -151,9 +151,9 @@ func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, input *Inpu
 	// generate moved blocks
 	if block.BlockType != wordData {
 		if input.DryRun {
-			logE.WithField("moved_file", block.MovedFile).Info("[DRY RUN] generate a moved block")
+			logE.WithField("moved_file", block.MovedFile).Debug("[DRY RUN] generate a moved block")
 		} else {
-			logE.WithField("moved_file", block.MovedFile).Info("writing a moved block")
+			logE.WithField("moved_file", block.MovedFile).Debug("writing a moved block")
 			if err := c.writeMovedBlock(block, block.NewName, block.MovedFile); err != nil {
 				return fmt.Errorf("write a moved block: %w", err)
 			}
@@ -204,9 +204,9 @@ func (c *Controller) fixRef(logE *logrus.Entry, dir *Dir, input *Input) error {
 			return fmt.Errorf("get a file stat: %w", logerr.WithFields(err, fields))
 		}
 		if input.DryRun {
-			logE.WithFields(fields).Info("[DRY RUN] fixing references")
+			logE.WithFields(fields).Debug("[DRY RUN] fixing references")
 		} else {
-			logE.WithFields(fields).Info("fixing references")
+			logE.WithFields(fields).Debug("fixing references")
 			if err := afero.WriteFile(c.fs, file, []byte(s), f.Mode()); err != nil {
 				return fmt.Errorf("write a file: %w", logerr.WithFields(err, fields))
 			}

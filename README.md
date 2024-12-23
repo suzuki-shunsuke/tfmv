@@ -218,6 +218,14 @@ The following directories are ignored:
 - .terraform
 - node_modules
 
+## `--log-level` Log Level
+
+You can change the log level using `--log-level` option.
+
+```sh
+tfmv -r '-/_' --log-level debug
+```
+
 ## Jsonnet
 
 `-r` is simple and useful, but sometimes you need more flexible renaming.

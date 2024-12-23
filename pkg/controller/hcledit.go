@@ -34,7 +34,7 @@ func (e *Editor) Move(logE *logrus.Entry, opt *MoveBlockOpt) error {
 			OutStream: io.Discard,
 			ErrStream: e.stderr,
 		})
-		logE.Info("[DRY RUN] moving a block")
+		logE.Debug("[DRY RUN] moving a block")
 		if err := cl.Edit(opt.FilePath, false, filter); err != nil {
 			return fmt.Errorf("move a block in %s from %s to %s: %w", opt.FilePath, opt.From, opt.To, err)
 		}
@@ -45,7 +45,7 @@ func (e *Editor) Move(logE *logrus.Entry, opt *MoveBlockOpt) error {
 		OutStream: opt.Stdout,
 		ErrStream: e.stderr,
 	})
-	logE.Info("moving a block")
+	logE.Debug("moving a block")
 	if err := cl.Edit(opt.FilePath, opt.Update, filter); err != nil {
 		return fmt.Errorf("move a block in %s from %s to %s: %w", opt.FilePath, opt.From, opt.To, err)
 	}
