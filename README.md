@@ -58,19 +58,28 @@ resource "github_repository" "example-1" {
   name = "example-1"
 }
 
-resource "github_branch" "example" {
+data "github_branch" "example-2" {
   repository = github_repository.example-1.name
   branch     = "example"
   depends_on = [
-    github_repository.example-1
+    github_repository.example-1,
+    module.example-3
   ]
+}
+
+module "example-3" {
+  source = "./foo/module"
+}
+
+output "branch_sha" {
+  value = data.github_branch.example-2.sha
 }
 ```
 
 Let's replace `-` with `_`.
-You need to specify either `-r` or `--jsonnet (-j)`.
+You must specify one of `--replace (-r)`, `--regexp`, or `--jsonnet (-j)`.
 In this case, let's use `-r`.
-[If you need more flexible renaming, you can use Jsonnet. For details, please see here](#jsonnet).
+If you need more flexible renaming, you can use [regular expression](#rename-resources-by-regular-expression) or [Jsonnet](#jsonnet). 
 
 Run `tfmv -r "-/_"`.
 You don't need to run `terraform init`.
@@ -86,23 +95,36 @@ main.tf:
 
 ```diff
 diff --git a/example/main.tf b/example/main.tf
-index 48ce91d..e618ab1 100644
+index 48ef3bd..9110880 100644
 --- a/example/main.tf
 +++ b/example/main.tf
-@@ -1,11 +1,11 @@
+@@ -1,20 +1,20 @@
 -resource "github_repository" "example-1" {
 +resource "github_repository" "example_1" {
    name = "example-1"
  }
  
- resource "github_branch" "example" {
+-data "github_branch" "example-2" {
 -  repository = github_repository.example-1.name
++data "github_branch" "example_2" {
 +  repository = github_repository.example_1.name
    branch     = "example"
    depends_on = [
--    github_repository.example-1
-+    github_repository.example_1
+-    github_repository.example-1,
+-    module.example-3
++    github_repository.example_1,
++    module.example_3
    ]
+ }
+ 
+-module "example-3" {
++module "example_3" {
+   source = "./foo/module"
+ }
+ 
+ output "branch_sha" {
+-  value = data.github_branch.example-2.sha
++  value = data.github_branch.example_2.sha
  }
 ```
 
@@ -112,6 +134,11 @@ moved.tf:
 moved {
   from = github_repository.example-1
   to   = github_repository.example_1
+}
+
+moved {
+  from = module.example-3
+  to   = module.example_3
 }
 ```
 
