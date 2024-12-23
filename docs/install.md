@@ -17,6 +17,15 @@ You can install tfmv using [Homebrew](https://brew.sh/).
 brew install suzuki-shunsuke/tfmv/tfmv
 ```
 
+## Scoop
+
+You can install tfmv using [Scoop](https://scoop.sh/).
+
+```sh
+scoop bucket add suzuki-shunsuke https://github.com/suzuki-shunsuke/scoop-bucket
+scoop install tfmv
+```
+
 ## aqua
 
 [aqua-registry >= v4.282.0](https://github.com/aquaproj/aqua-registry/releases/tag/v4.282.0)
