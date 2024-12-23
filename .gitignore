@@ -1,6 +1,4 @@
 .coverage
 .envrc
-moved.tf
-moved_blocks.tf
 .terraform
 .terraform.lock.hcl
