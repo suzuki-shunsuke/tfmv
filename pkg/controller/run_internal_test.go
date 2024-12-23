@@ -11,7 +11,7 @@ import (
 	"github.com/suzuki-shunsuke/tfmv/pkg/controller"
 )
 
-func TestController_Run(t *testing.T) {
+func TestController_Run(t *testing.T) { //nolint:funlen
 	t.Parallel()
 	tests := []struct {
 		name   string
