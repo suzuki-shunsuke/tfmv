@@ -117,7 +117,7 @@ func parseFlags(f *Flag) {
 	f.Args = flag.Args()
 }
 
-const help = `tfmv - Rename Terraform resources and modules and generate moved blocks.
+const help = `tfmv - Rename Terraform resources, data sources, and modules and generate moved blocks.
 https://github.com/suzuki-shunsuke/tfmv
 
 Usage:

@@ -32,7 +32,12 @@ func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*Blo
 }
 
 func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regexp.Regexp) (*Block, error) { //nolint:cyclop
-	if block.Type != wordResource && block.Type != "module" {
+	types := map[string]struct{}{
+		wordResource: {},
+		wordData:     {},
+		wordModule:   {},
+	}
+	if _, ok := types[block.Type]; !ok {
 		return nil, nil //nolint:nilnil
 	}
 	b := &Block{

@@ -150,12 +150,14 @@ func (c *Controller) handleFile(logE *logrus.Entry, renamer Renamer, input *Inpu
 
 func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, input *Input, block *Block) error {
 	// generate moved blocks
-	if input.DryRun {
-		logE.WithField("moved_file", block.MovedFile).Info("[DRY RUN] generate a moved block")
-	} else {
-		logE.WithField("moved_file", block.MovedFile).Info("writing a moved block")
-		if err := c.writeMovedBlock(block, block.NewName, block.MovedFile); err != nil {
-			return fmt.Errorf("write a moved block: %w", err)
+	if block.BlockType != wordData {
+		if input.DryRun {
+			logE.WithField("moved_file", block.MovedFile).Info("[DRY RUN] generate a moved block")
+		} else {
+			logE.WithField("moved_file", block.MovedFile).Info("writing a moved block")
+			if err := c.writeMovedBlock(block, block.NewName, block.MovedFile); err != nil {
+				return fmt.Errorf("write a moved block: %w", err)
+			}
 		}
 	}
 
