@@ -4,6 +4,8 @@
 
 tfmv is a CLI to rename Terraform resources, data sources, and modules and generate moved blocks.
 
+e.g. Replace `-` with `_`:
+
 ```sh
 tfmv -r "-/_"
 ```
@@ -30,7 +32,7 @@ index 48ce91d..e618ab1 100644
  }
 ```
 
-moved.tf:
+moved.tf is created:
 
 ```tf
 moved {
