@@ -1,10 +1,7 @@
 package main
 
 import (
-	"context"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/sirupsen/logrus"
 	"github.com/suzuki-shunsuke/logrus-error/logerr"
@@ -37,7 +34,5 @@ func core(logE *logrus.Entry) error {
 		},
 		LogE: logE,
 	}
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-	return runner.Run(ctx) //nolint:wrapcheck
+	return runner.Run() //nolint:wrapcheck
 }

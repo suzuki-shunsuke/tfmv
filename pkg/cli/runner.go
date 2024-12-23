@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -15,6 +14,28 @@ import (
 	"github.com/suzuki-shunsuke/tfmv/pkg/controller"
 	"github.com/suzuki-shunsuke/tfmv/pkg/log"
 )
+
+const help = `tfmv - Rename Terraform resources, data sources, and modules and generate moved blocks.
+https://github.com/suzuki-shunsuke/tfmv
+
+Usage:
+	tfmv [<options>] [file ...]
+
+One of --jsonnet (-j), --replace (-r), or --regexp must be specified.
+
+Options:
+	--help, -h       Show help
+	--version, -v    Show sort-issue-template version
+	--replace, -r    Replace strings in block names. The format is <old>/<new>. e.g. -/_
+	--jsonnet, -j    Jsonnet file path
+	--regexp         Replace strings in block names by regular expression. The format is <regular expression>/<new>. e.g. '\bfoo\b/bar'
+	--recursive, -R  If this is set, tfmv finds files recursively
+	--include        A regular expression to filter resources. Only resources that match the regular expression are renamed
+	--exclude        A regular expression to filter resources. Only resources that don't match the regular expression are renamed
+	--dry-run        Dry Run
+	--log-level      Log level
+	--log-color      Log color. "auto", "always", "never" are available
+	--moved, -m      A file name where moved blocks are written. If this is "same", the file is same with renamed resources`
 
 type Runner struct {
 	Stdin   io.Reader
@@ -30,7 +51,7 @@ type LDFlags struct {
 	Date    string
 }
 
-func (r *Runner) Run(ctx context.Context) error {
+func (r *Runner) Run() error {
 	flg := &Flag{}
 	parseFlags(flg)
 	if flg.Version {
@@ -64,7 +85,7 @@ func (r *Runner) Run(ctx context.Context) error {
 
 	ctrl := &controller.Controller{}
 	ctrl.Init(afero.NewOsFs(), r.Stdout, r.Stderr)
-	return ctrl.Run(ctx, r.LogE, &controller.Input{ //nolint:wrapcheck
+	return ctrl.Run(r.LogE, &controller.Input{ //nolint:wrapcheck
 		File:      flg.Jsonnet,
 		Dest:      flg.Moved,
 		Recursive: flg.Recursive,
@@ -116,25 +137,3 @@ func parseFlags(f *Flag) {
 	flag.Parse()
 	f.Args = flag.Args()
 }
-
-const help = `tfmv - Rename Terraform resources, data sources, and modules and generate moved blocks.
-https://github.com/suzuki-shunsuke/tfmv
-
-Usage:
-	tfmv [<options>] [file ...]
-
-One of --jsonnet (-j), --replace (-r), or --regexp must be specified.
-
-Options:
-	--help, -h       Show help
-	--version, -v    Show sort-issue-template version
-	--replace, -r    Replace strings in block names. The format is <old>/<new>. e.g. -/_
-	--jsonnet, -j    Jsonnet file path
-	--regexp         Replace strings in block names by regular expression. The format is <regular expression>/<new>. e.g. '\bfoo\b/bar'
-	--recursive, -R  If this is set, tfmv finds files recursively
-	--include        A regular expression to filter resources. Only resources that match the regular expression are renamed
-	--exclude        A regular expression to filter resources. Only resources that don't match the regular expression are renamed
-	--dry-run        Dry Run
-	--log-level      Log level
-	--log-color      Log color. "auto", "always", "never" are available
-	--moved, -m      A file name where moved blocks are written. If this is "same", the file is same with renamed resources`

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,7 +12,7 @@ import (
 	"github.com/suzuki-shunsuke/logrus-error/logerr"
 )
 
-func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) error {
+func (c *Controller) Run(logE *logrus.Entry, input *Input) error {
 	// read Jsonnet
 	renamer, err := NewRenamer(logE, c.fs, input)
 	if err != nil {
