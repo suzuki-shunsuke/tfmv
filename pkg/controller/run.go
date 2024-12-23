@@ -3,9 +3,11 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/logrus-error/logerr"
@@ -46,7 +48,9 @@ func (c *Controller) Run(_ context.Context, logE *logrus.Entry, input *Input) er
 		dir.Files = append(dir.Files, file)
 		blocks, err := c.handleFile(logE, renamer, input, file)
 		if err != nil {
-			return fmt.Errorf("handle a file: %w", err)
+			return fmt.Errorf("handle a file: %w", logerr.WithFields(err, logrus.Fields{
+				"file": file,
+			}))
 		}
 		dir.Blocks = append(dir.Blocks, blocks...)
 	}
@@ -131,6 +135,12 @@ func (c *Controller) handleFile(logE *logrus.Entry, renamer Renamer, input *Inpu
 		}
 		if newName == "" || newName == block.Name {
 			continue
+		}
+		if !hclsyntax.ValidIdentifier(newName) {
+			return nil, logerr.WithFields(errors.New("the new name is an invalid HCL identifier"), logrus.Fields{ //nolint:wrapcheck
+				"address":  block.TFAddress,
+				"new_name": newName,
+			})
 		}
 		block.SetNewName(newName)
 		arr = append(arr, block)
