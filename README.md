@@ -11,37 +11,15 @@ tfmv -r "-/_"
 ```
 
 ```diff
-diff --git a/example/main.tf b/example/main.tf
-index 48ef3bd..9110880 100644
---- a/example/main.tf
-+++ b/example/main.tf
-@@ -1,20 +1,20 @@
 -resource "github_repository" "example-1" {
 +resource "github_repository" "example_1" {
    name = "example-1"
  }
  
--data "github_branch" "example-2" {
+ data "github_branch" "example" {
 -  repository = github_repository.example-1.name
-+data "github_branch" "example_2" {
 +  repository = github_repository.example_1.name
    branch     = "example"
-   depends_on = [
--    github_repository.example-1,
--    module.example-3
-+    github_repository.example_1,
-+    module.example_3
-   ]
- }
- 
--module "example-3" {
-+module "example_3" {
-   source = "./foo/module"
- }
- 
- output "branch_sha" {
--  value = data.github_branch.example-2.sha
-+  value = data.github_branch.example_2.sha
  }
 ```
 
@@ -51,11 +29,6 @@ moved.tf is created:
 moved {
   from = github_repository.example-1
   to   = github_repository.example_1
-}
-
-moved {
-  from = module.example-3
-  to   = module.example_3
 }
 ```
 
