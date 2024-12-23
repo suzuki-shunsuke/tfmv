@@ -22,7 +22,7 @@ func TestController_Run(t *testing.T) {
 		isErr  bool
 	}{
 		{
-			name: "normal",
+			name: "no changed file",
 			files: map[string]string{
 				"main.tf": `resource "null_resource" "example_1" {}
 `,
@@ -33,6 +33,70 @@ func TestController_Run(t *testing.T) {
 				Args:    []string{"main.tf"},
 				Replace: "-/_",
 				DryRun:  true,
+			},
+		},
+		{
+			name: "replace",
+			files: map[string]string{
+				"testdata/main.tf": `resource "null_resource" "example-1" {}
+`,
+			},
+			stdout: &bytes.Buffer{},
+			stderr: &bytes.Buffer{},
+			input: &controller.Input{
+				Args:    []string{"testdata/main.tf"},
+				Replace: "-/_",
+				DryRun:  true,
+			},
+		},
+		{
+			name: "regexp",
+			files: map[string]string{
+				"testdata/main.tf": `resource "null_resource" "example-1" {}
+`,
+			},
+			stdout: &bytes.Buffer{},
+			stderr: &bytes.Buffer{},
+			input: &controller.Input{
+				Args:   []string{"testdata/main.tf"},
+				Regexp: "^example-/test-",
+				DryRun: true,
+			},
+		},
+		{
+			name: "jsonnet",
+			files: map[string]string{
+				"testdata/main.tf": `resource "null_resource" "example-1" {}
+`,
+				"main.jsonnet": `std.native("strings.Replace")(std.extVar('input').name, "-", "_", -1)[0]
+`,
+			},
+			stdout: &bytes.Buffer{},
+			stderr: &bytes.Buffer{},
+			input: &controller.Input{
+				Args:   []string{"testdata/main.tf"},
+				File:   "main.jsonnet",
+				DryRun: true,
+			},
+		},
+		{
+			name: "no renamer",
+			files: map[string]string{
+				"testdata/main.tf": `resource "null_resource" "example-1" {}
+`,
+			},
+			stdout: &bytes.Buffer{},
+			stderr: &bytes.Buffer{},
+			input:  &controller.Input{},
+			isErr:  true,
+		},
+		{
+			name:   "no file is found",
+			files:  map[string]string{},
+			stdout: &bytes.Buffer{},
+			stderr: &bytes.Buffer{},
+			input: &controller.Input{
+				Replace: "-/_",
 			},
 		},
 	}
