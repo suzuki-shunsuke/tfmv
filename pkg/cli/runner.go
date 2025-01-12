@@ -25,7 +25,7 @@ One of --jsonnet (-j), --replace (-r), or --regexp must be specified.
 
 Options:
 	--help, -h       Show help
-	--version, -v    Show sort-issue-template version
+	--version, -v    Show tfmv version
 	--replace, -r    Replace strings in block names. The format is <old>/<new>. e.g. -/_
 	--jsonnet, -j    Jsonnet file path
 	--regexp         Replace strings in block names by regular expression. The format is <regular expression>/<new>. e.g. '\bfoo\b/bar'
