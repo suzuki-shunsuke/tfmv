@@ -13,11 +13,11 @@ import (
 )
 
 func (c *Controller) Run(logE *logrus.Entry, input *Input) error {
-	// read Jsonnet
 	renamer, err := NewRenamer(logE, c.fs, input)
 	if err != nil {
 		return err
 	}
+
 	// find *.tf
 	logE.Debug("finding tf files")
 	files, err := c.findFiles(input)
@@ -29,6 +29,7 @@ func (c *Controller) Run(logE *logrus.Entry, input *Input) error {
 		return nil
 	}
 	logE.WithField("num_of_files", len(files)).Debug("found tf files")
+
 	// read *.tf
 	editor := &Editor{
 		stderr: c.stderr,
@@ -53,9 +54,11 @@ func (c *Controller) Run(logE *logrus.Entry, input *Input) error {
 		}
 		dir.Blocks = append(dir.Blocks, blocks...)
 	}
+
 	if err := c.summarize(dirs); err != nil {
 		logerr.WithError(logE, err).Warn("output changed summary")
 	}
+
 	for _, dir := range dirs {
 		if err := c.handleDir(logE, editor, input, dir); err != nil {
 			return err
@@ -64,6 +67,7 @@ func (c *Controller) Run(logE *logrus.Entry, input *Input) error {
 	return nil
 }
 
+// summarize outputs a summary of changes as JSON to stdout.
 func (c *Controller) summarize(dirs map[string]*Dir) error {
 	summary := &Summary{}
 	summary.FromDirs(dirs)
@@ -75,6 +79,7 @@ func (c *Controller) summarize(dirs map[string]*Dir) error {
 	return nil
 }
 
+// handleDir modifies files in a given directory.
 func (c *Controller) handleDir(logE *logrus.Entry, editor *Editor, input *Input, dir *Dir) error {
 	// fix references
 	if err := c.fixRef(logE, dir, input); err != nil {
@@ -95,6 +100,7 @@ func (c *Controller) handleDir(logE *logrus.Entry, editor *Editor, input *Input,
 	return nil
 }
 
+// getMovedFile returns a file path where moved blocks are written.
 func getMovedFile(file, dest string) string {
 	if dest == "same" {
 		dest = filepath.Base(file)
@@ -102,13 +108,14 @@ func getMovedFile(file, dest string) string {
 	return filepath.Join(filepath.Dir(file), dest)
 }
 
+// handleFile reads and parses a file and returns renamed blocks.
+// handleFile doesn't actually edit a file.
 func (c *Controller) handleFile(logE *logrus.Entry, renamer Renamer, input *Input, file string) ([]*Block, error) {
 	logE.Debug("reading a tf file")
 	b, err := afero.ReadFile(c.fs, file)
 	if err != nil {
 		return nil, fmt.Errorf("read a file: %w", err)
 	}
-	// parse *.tf
 	logE.Debug("parsing a tf file")
 	blocks, err := parse(b, file, input.Include, input.Exclude)
 	if err != nil {
@@ -119,7 +126,7 @@ func (c *Controller) handleFile(logE *logrus.Entry, renamer Renamer, input *Inpu
 		return nil, nil
 	}
 	arr := []*Block{}
-	movedFile := getMovedFile(file, input.Dest)
+	movedFile := getMovedFile(file, input.MovedFile)
 	for _, block := range blocks {
 		logE := logE.WithFields(logrus.Fields{
 			"block_type":    block.BlockType,
@@ -147,6 +154,7 @@ func (c *Controller) handleFile(logE *logrus.Entry, renamer Renamer, input *Inpu
 	return arr, nil
 }
 
+// handleBlock generates a moved block and renames a block.
 func (c *Controller) handleBlock(logE *logrus.Entry, editor *Editor, input *Input, block *Block) error {
 	// generate moved blocks
 	if block.BlockType != wordData {

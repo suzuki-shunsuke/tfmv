@@ -86,8 +86,8 @@ func (r *Runner) Run() error {
 	ctrl := &controller.Controller{}
 	ctrl.Init(afero.NewOsFs(), r.Stdout, r.Stderr)
 	return ctrl.Run(r.LogE, &controller.Input{ //nolint:wrapcheck
-		File:      flg.Jsonnet,
-		Dest:      flg.Moved,
+		Jsonnet:   flg.Jsonnet,
+		MovedFile: flg.Moved,
 		Recursive: flg.Recursive,
 		DryRun:    flg.DryRun,
 		Args:      flg.Args,
