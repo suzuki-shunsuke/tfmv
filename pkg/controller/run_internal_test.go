@@ -74,9 +74,9 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			stdout: &bytes.Buffer{},
 			stderr: &bytes.Buffer{},
 			input: &controller.Input{
-				Args:   []string{"testdata/main.tf"},
-				File:   "main.jsonnet",
-				DryRun: true,
+				Args:    []string{"testdata/main.tf"},
+				Jsonnet: "main.jsonnet",
+				DryRun:  true,
 			},
 		},
 		{
