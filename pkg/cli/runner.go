@@ -33,6 +33,7 @@ Options:
 	--recursive, -R  If this is set, tfmv finds files recursively
 	--include        A regular expression to filter resources. Only resources that match the regular expression are renamed
 	--exclude        A regular expression to filter resources. Only resources that don't match the regular expression are renamed
+	--type, -t       Either 'name' or 'type'
 	--dry-run        Dry Run
 	--log-level      Log level
 	--log-color      Log color. "auto", "always", "never" are available
@@ -73,6 +74,9 @@ func (r *Runner) Run() error {
 			return errors.New("--moved name must be either 'same' or a file name with the suffix .tf")
 		}
 	}
+	if flg.Type != "name" && flg.Type != "type" {
+		return errors.New("--type must be either 'name' or 'type'")
+	}
 
 	include, err := getRegexFilter(flg.Include)
 	if err != nil {
@@ -112,6 +116,7 @@ type Flag struct {
 	LogLevel  string
 	LogColor  string
 	Replace   string
+	Type      string
 	Regexp    string
 	Include   string
 	Exclude   string
@@ -126,6 +131,7 @@ func parseFlags(f *Flag) {
 	flag.StringVarP(&f.Jsonnet, "jsonnet", "j", "", "Jsonnet file path")
 	flag.StringVarP(&f.Moved, "moved", "m", "moved.tf", "The destination file name")
 	flag.StringVarP(&f.Replace, "replace", "r", "", "Replace strings in block names. The format is <old>/<new>. e.g. -/_")
+	flag.StringVarP(&f.Type, "type", "t", "name", "The type to rename. Either 'name' or 'type'")
 	flag.StringVar(&f.Regexp, "regexp", "", "Replace strings in block names by regular expression. The format is <regular expression>/<new>. e.g. '\bfoo\b/bar'")
 	flag.StringVar(&f.Include, "include", "", "A regular expression to filter resources")
 	flag.StringVar(&f.Exclude, "exclude", "", "A regular expression to filter resources")

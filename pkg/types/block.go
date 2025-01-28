@@ -23,6 +23,8 @@ type Block struct {
 	Name string `json:"name"`
 	// NewName is a new resource name.
 	NewName string `json:"-"`
+	// NewResourceType is a new resource type.
+	NewResourceType string `json:"-"`
 	// MovedFile is a file path where moved blocks are written.
 	MovedFile string `json:"-"`
 	// Regexp is a regular expression to capture a resource reference.
@@ -106,6 +108,13 @@ func (b *Block) SetNewName(newName string) {
 	b.NewName = newName
 	b.NewHCLAddress = hclAddress(b.BlockType, b.ResourceType, newName)
 	b.NewTFAddress = tfAddress(b.BlockType, b.ResourceType, newName)
+}
+
+// SetNewResourceType sets updates a new resource type, a new HCL address, and a new Terraform address.
+func (b *Block) SetNewResourceType(n string) {
+	b.NewResourceType = n
+	b.NewHCLAddress = hclAddress(b.BlockType, n, b.Name)
+	b.NewTFAddress = tfAddress(b.BlockType, n, b.Name)
 }
 
 // Init initializes a block attributes.

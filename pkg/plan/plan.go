@@ -1,11 +1,9 @@
 package plan
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/logrus-error/logerr"
@@ -91,20 +89,9 @@ func (c *Planner) handleFile(logE *logrus.Entry, renamer rename.Renamer, input *
 		})
 		logE.Debug("handling a block")
 		block.MovedFile = movedFile
-		newName, err := renamer.Rename(block)
-		if err != nil {
+		if err := rename.Rename(renamer, block, input.Type); err != nil {
 			return nil, fmt.Errorf("get a new name: %w", err)
 		}
-		if newName == "" || newName == block.Name {
-			continue
-		}
-		if !hclsyntax.ValidIdentifier(newName) {
-			return nil, logerr.WithFields(errors.New("the new name is an invalid HCL identifier"), logrus.Fields{ //nolint:wrapcheck
-				"address":  block.TFAddress,
-				"new_name": newName,
-			})
-		}
-		block.SetNewName(newName)
 		arr = append(arr, block)
 	}
 	return arr, nil
