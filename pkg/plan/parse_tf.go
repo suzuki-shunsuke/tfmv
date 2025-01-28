@@ -1,14 +1,16 @@
-package controller
+package plan
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
-func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*Block, error) {
+func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*types.Block, error) {
 	file, diags := hclsyntax.ParseConfig(src, filePath, hcl.Pos{Byte: 0, Line: 1, Column: 1})
 	if diags.HasErrors() {
 		return nil, diags
@@ -17,7 +19,7 @@ func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*Blo
 	if !ok {
 		return nil, errors.New("convert file body to body type")
 	}
-	blocks := make([]*Block, 0, len(body.Blocks))
+	blocks := make([]*types.Block, 0, len(body.Blocks))
 	for _, block := range body.Blocks {
 		b, err := parseBlock(filePath, block, include, exclude)
 		if err != nil {
@@ -31,16 +33,11 @@ func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*Blo
 	return blocks, nil
 }
 
-func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regexp.Regexp) (*Block, error) {
-	types := map[string]struct{}{
-		wordResource: {},
-		wordData:     {},
-		wordModule:   {},
-	}
-	if _, ok := types[block.Type]; !ok {
+func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regexp.Regexp) (*types.Block, error) {
+	if _, ok := types.Types()[block.Type]; !ok {
 		return nil, nil //nolint:nilnil
 	}
-	b := &Block{
+	b := &types.Block{
 		File:      filePath,
 		BlockType: block.Type,
 	}
@@ -54,7 +51,7 @@ func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regex
 		return nil, nil //nolint:nilnil
 	}
 	if err := b.Init(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("initialize block attributes: %w", err)
 	}
 	if exclude != nil && exclude.MatchString(b.TFAddress) {
 		return nil, nil //nolint:nilnil

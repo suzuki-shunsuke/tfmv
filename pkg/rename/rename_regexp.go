@@ -1,9 +1,11 @@
-package controller
+package rename
 
 import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
 // RegexpRenamer is a Renamer which renames addresses by replacing a regular expression `regexp` to `new`.
@@ -26,6 +28,6 @@ func NewRegexpRenamer(s string) (*RegexpRenamer, error) {
 }
 
 // Rename renames a block address.
-func (r *RegexpRenamer) Rename(block *Block) (string, error) {
+func (r *RegexpRenamer) Rename(block *types.Block) (string, error) {
 	return r.regexp.ReplaceAllString(block.Name, r.new), nil
 }

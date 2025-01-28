@@ -13,6 +13,7 @@ import (
 	flag "github.com/spf13/pflag"
 	"github.com/suzuki-shunsuke/tfmv/pkg/controller"
 	"github.com/suzuki-shunsuke/tfmv/pkg/log"
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
 const help = `tfmv - Rename Terraform resources, data sources, and modules and generate moved blocks.
@@ -85,7 +86,7 @@ func (r *Runner) Run() error {
 
 	ctrl := &controller.Controller{}
 	ctrl.Init(afero.NewOsFs(), r.Stdout, r.Stderr)
-	return ctrl.Run(r.LogE, &controller.Input{ //nolint:wrapcheck
+	return ctrl.Run(r.LogE, &types.Input{ //nolint:wrapcheck
 		Jsonnet:   flg.Jsonnet,
 		MovedFile: flg.Moved,
 		Recursive: flg.Recursive,

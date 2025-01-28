@@ -1,17 +1,18 @@
-package controller
+package apply
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/spf13/afero"
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
-func (c *Controller) writeMovedBlock(block *Block, dest, movedFile string) error {
-	if block.BlockType == wordData {
+func (a *Applier) writeMovedBlock(block *types.Block, dest, movedFile string) error {
+	if block.IsData() {
 		return nil
 	}
-	file, err := c.fs.OpenFile(movedFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644) //nolint:mnd
+	file, err := a.fs.OpenFile(movedFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644) //nolint:mnd
 	if err != nil {
 		return fmt.Errorf("open a file: %w", err)
 	}
@@ -28,7 +29,7 @@ func (c *Controller) writeMovedBlock(block *Block, dest, movedFile string) error
 }
 `, block.Name, dest)
 	}
-	if f, err := afero.Exists(c.fs, movedFile); err == nil && f {
+	if f, err := afero.Exists(a.fs, movedFile); err == nil && f {
 		content = "\n" + content
 	}
 	fmt.Fprint(file, content)

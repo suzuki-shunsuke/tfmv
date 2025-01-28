@@ -1,8 +1,10 @@
-package controller
+package rename
 
 import (
 	"fmt"
 	"strings"
+
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
 // ReplaceRenamer is a Renamer which renames addresses by replacing a fixed string `old` to `new`.
@@ -22,6 +24,6 @@ func NewReplaceRenamer(s string) (*ReplaceRenamer, error) {
 }
 
 // Rename renames a block address.
-func (r *ReplaceRenamer) Rename(block *Block) (string, error) {
+func (r *ReplaceRenamer) Rename(block *types.Block) (string, error) {
 	return strings.ReplaceAll(block.Name, r.old, r.new), nil
 }

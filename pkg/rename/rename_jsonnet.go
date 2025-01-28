@@ -1,4 +1,4 @@
-package controller
+package rename
 
 import (
 	"encoding/json"
@@ -13,6 +13,7 @@ import (
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/strings"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
 type JsonnetRenamer struct {
@@ -35,7 +36,7 @@ func NewJsonnetRenamer(logE *logrus.Entry, fs afero.Fs, file string) (*JsonnetRe
 	return &JsonnetRenamer{node: node}, nil
 }
 
-func (j *JsonnetRenamer) Rename(block *Block) (string, error) {
+func (j *JsonnetRenamer) Rename(block *types.Block) (string, error) {
 	b, err := json.Marshal(block)
 	if err != nil {
 		return "", fmt.Errorf("marshal a block: %w", err)

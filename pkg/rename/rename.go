@@ -1,19 +1,20 @@
-package controller
+package rename
 
 import (
 	"errors"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
 // Renamer is an interface to rename a block address.
 type Renamer interface {
-	Rename(block *Block) (string, error)
+	Rename(block *types.Block) (string, error)
 }
 
-// NewRenamer creates a Renamer.
-func NewRenamer(logE *logrus.Entry, fs afero.Fs, input *Input) (Renamer, error) {
+// New creates a Renamer.
+func New(logE *logrus.Entry, fs afero.Fs, input *types.Input) (Renamer, error) {
 	if input.Replace != "" {
 		return NewReplaceRenamer(input.Replace)
 	}

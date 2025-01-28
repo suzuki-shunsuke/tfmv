@@ -1,4 +1,4 @@
-package controller
+package plan
 
 import (
 	"fmt"
@@ -6,9 +6,10 @@ import (
 	"strings"
 
 	"github.com/spf13/afero"
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
-func (c *Controller) findFiles(input *Input) ([]string, error) {
+func (c *Planner) findFiles(input *types.Input) ([]string, error) {
 	if len(input.Args) != 0 {
 		return input.Args, nil
 	}
@@ -18,7 +19,7 @@ func (c *Controller) findFiles(input *Input) ([]string, error) {
 	return afero.Glob(c.fs, "*.tf") //nolint:wrapcheck
 }
 
-func (c *Controller) walkFiles() ([]string, error) {
+func (c *Planner) walkFiles() ([]string, error) {
 	// find *.tf
 	ignoreDirs := map[string]struct{}{
 		".git":         {},
