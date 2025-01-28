@@ -8,7 +8,7 @@ import (
 	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
-func (a *Applier) writeMovedBlock(block *types.Block, dest, movedFile string) error {
+func (a *Applier) writeMovedBlock(block *types.Block, movedFile string) error {
 	if block.IsData() {
 		return nil
 	}
@@ -18,17 +18,10 @@ func (a *Applier) writeMovedBlock(block *types.Block, dest, movedFile string) er
 	}
 	defer file.Close()
 	content := fmt.Sprintf(`moved {
-  from = %s.%s
-  to   = %s.%s
+  from = %s
+  to   = %s
 }
-`, block.ResourceType, block.Name, block.ResourceType, dest)
-	if !block.IsResource() {
-		content = fmt.Sprintf(`moved {
-  from = module.%s
-  to   = module.%s
-}
-`, block.Name, dest)
-	}
+`, block.TFAddress, block.NewTFAddress)
 	if f, err := afero.Exists(a.fs, movedFile); err == nil && f {
 		content = "\n" + content
 	}
