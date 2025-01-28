@@ -71,7 +71,7 @@ func (c *Planner) handleFile(logE *logrus.Entry, renamer rename.Renamer, input *
 		return nil, fmt.Errorf("read a file: %w", err)
 	}
 	logE.Debug("parsing a tf file")
-	blocks, err := parse(b, file, input.Include, input.Exclude)
+	blocks, err := parse(b, file, input)
 	if err != nil {
 		return nil, fmt.Errorf("parse a HCL file: %w", err)
 	}
