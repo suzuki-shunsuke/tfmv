@@ -1,5 +1,4 @@
 
-
 moved {
   from = aws_elasticsearch_domain.example_1
   to   = aws_opensearch_domain.example_1
