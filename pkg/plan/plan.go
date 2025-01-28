@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/logrus-error/logerr"
+	"github.com/suzuki-shunsuke/tfmv/pkg/rename"
 	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
@@ -23,7 +24,7 @@ func NewPlanner(fs afero.Fs) *Planner {
 }
 
 func (c *Planner) Plan(logE *logrus.Entry, input *types.Input) (map[string]*types.Dir, error) {
-	renamer, err := NewRenamer(logE, c.fs, input)
+	renamer, err := rename.New(logE, c.fs, input)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +66,7 @@ func (c *Planner) Plan(logE *logrus.Entry, input *types.Input) (map[string]*type
 
 // handleFile reads and parses a file and returns renamed blocks.
 // handleFile doesn't actually edit a file.
-func (c *Planner) handleFile(logE *logrus.Entry, renamer Renamer, input *types.Input, file string) ([]*types.Block, error) {
+func (c *Planner) handleFile(logE *logrus.Entry, renamer rename.Renamer, input *types.Input, file string) ([]*types.Block, error) {
 	logE.Debug("reading a tf file")
 	b, err := afero.ReadFile(c.fs, file)
 	if err != nil {

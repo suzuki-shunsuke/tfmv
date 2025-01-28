@@ -1,4 +1,4 @@
-package plan
+package rename
 
 import (
 	"errors"
@@ -13,8 +13,8 @@ type Renamer interface {
 	Rename(block *types.Block) (string, error)
 }
 
-// NewRenamer creates a Renamer.
-func NewRenamer(logE *logrus.Entry, fs afero.Fs, input *types.Input) (Renamer, error) {
+// New creates a Renamer.
+func New(logE *logrus.Entry, fs afero.Fs, input *types.Input) (Renamer, error) {
 	if input.Replace != "" {
 		return NewReplaceRenamer(input.Replace)
 	}
