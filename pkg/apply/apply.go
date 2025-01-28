@@ -108,7 +108,7 @@ func (a *Applier) handleBlock(logE *logrus.Entry, editor *Editor, input *types.I
 			logE.WithField("moved_file", block.MovedFile).Debug("[DRY RUN] generate a moved block")
 		} else {
 			logE.WithField("moved_file", block.MovedFile).Debug("writing a moved block")
-			if err := a.writeMovedBlock(block, block.NewName, block.MovedFile); err != nil {
+			if err := a.writeMovedBlock(block, block.MovedFile); err != nil {
 				return fmt.Errorf("write a moved block: %w", err)
 			}
 		}

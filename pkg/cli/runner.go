@@ -100,6 +100,7 @@ func (r *Runner) Run() error {
 		Include:   include,
 		Exclude:   exclude,
 		Regexp:    flg.Regexp,
+		Type:      flg.Type,
 	})
 }
 
