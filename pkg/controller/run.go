@@ -15,7 +15,7 @@ func (c *Controller) Run(logE *logrus.Entry, input *types.Input) error {
 	planner := plan.NewPlanner(c.fs)
 	dirs, err := planner.Plan(logE, input)
 	if err != nil {
-		return err
+		return fmt.Errorf("plan changes: %w", err)
 	}
 
 	if err := c.summarize(dirs); err != nil {
@@ -24,7 +24,7 @@ func (c *Controller) Run(logE *logrus.Entry, input *types.Input) error {
 
 	applier := apply.New(c.fs, c.stderr)
 	if err := applier.Apply(logE, input, dirs); err != nil {
-		return err
+		return fmt.Errorf("apply changes: %w", err)
 	}
 	return nil
 }

@@ -26,7 +26,7 @@ func NewPlanner(fs afero.Fs) *Planner {
 func (c *Planner) Plan(logE *logrus.Entry, input *types.Input) (map[string]*types.Dir, error) {
 	renamer, err := rename.New(logE, c.fs, input)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("initialize a renamer: %w", err)
 	}
 
 	// find *.tf
@@ -37,7 +37,7 @@ func (c *Planner) Plan(logE *logrus.Entry, input *types.Input) (map[string]*type
 	}
 	if len(files) == 0 {
 		logE.Warn("no tf file is found")
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 	logE.WithField("num_of_files", len(files)).Debug("found tf files")
 

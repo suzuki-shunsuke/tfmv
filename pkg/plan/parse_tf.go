@@ -2,6 +2,7 @@ package plan
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 
 	"github.com/hashicorp/hcl/v2"
@@ -50,7 +51,7 @@ func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regex
 		return nil, nil //nolint:nilnil
 	}
 	if err := b.Init(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("initialize block attributes: %w", err)
 	}
 	if exclude != nil && exclude.MatchString(b.TFAddress) {
 		return nil, nil //nolint:nilnil
