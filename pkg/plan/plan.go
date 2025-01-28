@@ -89,10 +89,13 @@ func (c *Planner) handleFile(logE *logrus.Entry, renamer rename.Renamer, input *
 		})
 		logE.Debug("handling a block")
 		block.MovedFile = movedFile
-		if err := rename.Rename(renamer, block, input.Type); err != nil {
+		renamed, err := rename.Rename(renamer, block, input.Type)
+		if err != nil {
 			return nil, fmt.Errorf("get a new name: %w", err)
 		}
-		arr = append(arr, block)
+		if renamed {
+			arr = append(arr, block)
+		}
 	}
 	return arr, nil
 }

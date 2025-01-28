@@ -31,49 +31,50 @@ func New(logE *logrus.Entry, fs afero.Fs, input *types.Input) (Renamer, error) {
 	return nil, errors.New("one of --jsonnet or --replace or --regexp must be specified")
 }
 
-func Rename(renamer Renamer, block *types.Block, typ string) error {
+// Rename returns true if the block is renamed.
+func Rename(renamer Renamer, block *types.Block, typ string) (bool, error) {
 	switch typ {
 	case "name":
 		return renameName(renamer, block)
 	case "type":
 		return renameResourceType(renamer, block)
 	default:
-		return fmt.Errorf("unsupported type: %s", typ)
+		return false, fmt.Errorf("unsupported type: %s", typ)
 	}
 }
 
-func renameResourceType(renamer Renamer, block *types.Block) error {
+func renameResourceType(renamer Renamer, block *types.Block) (bool, error) {
 	n, err := renamer.RenameResourceType(block)
 	if err != nil {
-		return fmt.Errorf("get a new name: %w", err)
+		return false, fmt.Errorf("get a new name: %w", err)
 	}
 	if n == "" || n == block.ResourceType {
-		return nil
+		return false, nil
 	}
 	if !hclsyntax.ValidIdentifier(n) {
-		return logerr.WithFields(errors.New("the new resource type is an invalid HCL identifier"), logrus.Fields{ //nolint:wrapcheck
+		return false, logerr.WithFields(errors.New("the new resource type is an invalid HCL identifier"), logrus.Fields{ //nolint:wrapcheck
 			"address":           block.TFAddress,
 			"new_resource_type": n,
 		})
 	}
 	block.SetNewResourceType(n)
-	return nil
+	return true, nil
 }
 
-func renameName(renamer Renamer, block *types.Block) error {
+func renameName(renamer Renamer, block *types.Block) (bool, error) {
 	newName, err := renamer.RenameName(block)
 	if err != nil {
-		return fmt.Errorf("get a new name: %w", err)
+		return false, fmt.Errorf("get a new name: %w", err)
 	}
 	if newName == "" || newName == block.Name {
-		return nil
+		return false, nil
 	}
 	if !hclsyntax.ValidIdentifier(newName) {
-		return logerr.WithFields(errors.New("the new name is an invalid HCL identifier"), logrus.Fields{ //nolint:wrapcheck
+		return false, logerr.WithFields(errors.New("the new name is an invalid HCL identifier"), logrus.Fields{ //nolint:wrapcheck
 			"address":  block.TFAddress,
 			"new_name": newName,
 		})
 	}
 	block.SetNewName(newName)
-	return nil
+	return true, nil
 }
