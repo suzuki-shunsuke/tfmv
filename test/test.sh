@@ -4,8 +4,9 @@ set -eu
 
 cd "$(dirname "$0")"
 
-for dir in arg dry-run exclude-1 exclude-2 include-1 include-2 jsonnet moved recursive regexp replace; do
+while read file; do
+  dir=$(dirname "$file")
   pushd "$dir"
   bash run.sh test
   popd
-done
+done < <(find . -name run.sh)
