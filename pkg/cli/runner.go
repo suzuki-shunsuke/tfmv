@@ -33,7 +33,7 @@ Options:
 	--recursive, -R  If this is set, tfmv finds files recursively
 	--include        A regular expression to filter resources. Only resources that match the regular expression are renamed
 	--exclude        A regular expression to filter resources. Only resources that don't match the regular expression are renamed
-	--type, -t       Either 'name' or 'type'
+	--type, -t       One of 'name', 'type', or 'address'
 	--dry-run        Dry Run
 	--log-level      Log level
 	--log-color      Log color. "auto", "always", "never" are available
@@ -74,8 +74,8 @@ func (r *Runner) Run() error {
 			return errors.New("--moved name must be either 'same' or a file name with the suffix .tf")
 		}
 	}
-	if flg.Type != "name" && flg.Type != "type" {
-		return errors.New("--type must be either 'name' or 'type'")
+	if flg.Type != "name" && flg.Type != "type" && flg.Type != "address" {
+		return errors.New("--type must be one of 'name', 'type', or 'address'")
 	}
 
 	include, err := getRegexFilter(flg.Include)

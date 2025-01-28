@@ -3,6 +3,7 @@ package rename
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
@@ -15,6 +16,7 @@ import (
 type Renamer interface {
 	RenameName(block *types.Block) (string, error)
 	RenameResourceType(block *types.Block) (string, error)
+	RenameAddress(block *types.Block) (string, error)
 }
 
 // New creates a Renamer.
@@ -37,6 +39,8 @@ func Rename(renamer Renamer, block *types.Block, typ string) (bool, error) {
 	case "name":
 		return renameName(renamer, block)
 	case "type":
+		return renameResourceType(renamer, block)
+	case "address":
 		return renameResourceType(renamer, block)
 	default:
 		return false, fmt.Errorf("unsupported type: %s", typ)
@@ -76,5 +80,47 @@ func renameName(renamer Renamer, block *types.Block) (bool, error) {
 		})
 	}
 	block.SetNewName(newName)
+	return true, nil
+}
+
+func renameAddress(renamer Renamer, block *types.Block) (bool, error) {
+	newAddress, err := renamer.RenameAddress(block)
+	if err != nil {
+		return false, fmt.Errorf("get a new name: %w", err)
+	}
+	if newAddress == "" || newAddress == block.TFAddress {
+		return false, nil
+	}
+	arr := strings.Split(newAddress, ".")
+	for _, a := range arr {
+		if !hclsyntax.ValidIdentifier(a) {
+			return false, logerr.WithFields(errors.New("the new address is an invalid HCL identifier"), logrus.Fields{ //nolint:wrapcheck
+				"address":     block.TFAddress,
+				"new_address": newAddress,
+			})
+		}
+	}
+	if arr[0] != block.BlockType {
+		return false, logerr.WithFields(errors.New("block type can't be changed"), logrus.Fields{ //nolint:wrapcheck
+			"address":     block.TFAddress,
+			"new_address": newAddress,
+		})
+	}
+	if len(strings.Split(block.TFAddress, ".")) != len(arr) {
+		return false, logerr.WithFields(errors.New("invalid change"), logrus.Fields{ //nolint:wrapcheck
+			"address":     block.TFAddress,
+			"new_address": newAddress,
+		})
+	}
+	switch len(arr) {
+	case 2: //nolint:mnd
+		// module "foo"
+		block.SetNewName(arr[1])
+		return true, nil
+	case 3: //nolint:mnd
+		// resource "null_resource" "foo"
+		block.SetNewAddress(arr[1], arr[2])
+		return true, nil
+	}
 	return true, nil
 }

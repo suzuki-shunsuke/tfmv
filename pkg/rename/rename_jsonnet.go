@@ -44,6 +44,10 @@ func (j *JsonnetRenamer) RenameResourceType(block *types.Block) (string, error) 
 	return j.rename(block)
 }
 
+func (j *JsonnetRenamer) RenameAddress(block *types.Block) (string, error) {
+	return j.rename(block)
+}
+
 func (j *JsonnetRenamer) rename(block *types.Block) (string, error) {
 	b, err := json.Marshal(block)
 	if err != nil {

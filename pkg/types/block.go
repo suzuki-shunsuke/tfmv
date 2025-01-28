@@ -117,6 +117,13 @@ func (b *Block) SetNewResourceType(n string) {
 	b.NewTFAddress = tfAddress(b.BlockType, n, b.Name)
 }
 
+func (b *Block) SetNewAddress(typ, name string) {
+	b.NewResourceType = typ
+	b.NewName = name
+	b.NewHCLAddress = hclAddress(b.BlockType, typ, name)
+	b.NewTFAddress = tfAddress(b.BlockType, typ, name)
+}
+
 // Init initializes a block attributes.
 func (b *Block) Init() error {
 	b.TFAddress = tfAddress(b.BlockType, b.ResourceType, b.Name)
