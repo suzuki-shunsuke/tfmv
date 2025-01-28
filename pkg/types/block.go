@@ -1,4 +1,4 @@
-package controller
+package types
 
 import (
 	"fmt"
@@ -46,6 +46,19 @@ func isResource(blockType string) bool {
 // isResource returns true if the block type is "resource".
 func (b *Block) IsResource() bool {
 	return isResource(b.BlockType)
+}
+
+func (b *Block) IsData() bool {
+	return b.BlockType == wordData
+}
+
+// Types returns a map of block types.
+func Types() map[string]struct{} {
+	return map[string]struct{}{
+		wordResource: {},
+		wordData:     {},
+		wordModule:   {},
+	}
 }
 
 // hclAddress returns a HCL address.

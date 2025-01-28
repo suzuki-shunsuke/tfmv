@@ -1,4 +1,4 @@
-package controller
+package plan
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/logrus-error/logerr"
+	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
 type Planner struct {
@@ -21,7 +22,7 @@ func NewPlanner(fs afero.Fs) *Planner {
 	}
 }
 
-func (c *Planner) Plan(logE *logrus.Entry, input *Input) (map[string]*Dir, error) {
+func (c *Planner) Plan(logE *logrus.Entry, input *types.Input) (map[string]*types.Dir, error) {
 	renamer, err := NewRenamer(logE, c.fs, input)
 	if err != nil {
 		return nil, err
@@ -40,14 +41,14 @@ func (c *Planner) Plan(logE *logrus.Entry, input *Input) (map[string]*Dir, error
 	logE.WithField("num_of_files", len(files)).Debug("found tf files")
 
 	// read *.tf
-	dirs := map[string]*Dir{}
+	dirs := map[string]*types.Dir{}
 	for _, file := range files {
 		logE := logE.WithField("file", file)
 		logE.Debug("handling a file")
 		dirPath := filepath.Dir(file)
 		dir, ok := dirs[dirPath]
 		if !ok {
-			dir = &Dir{Path: dirPath}
+			dir = &types.Dir{Path: dirPath}
 			dirs[dirPath] = dir
 		}
 		dir.Files = append(dir.Files, file)
@@ -64,7 +65,7 @@ func (c *Planner) Plan(logE *logrus.Entry, input *Input) (map[string]*Dir, error
 
 // handleFile reads and parses a file and returns renamed blocks.
 // handleFile doesn't actually edit a file.
-func (c *Planner) handleFile(logE *logrus.Entry, renamer Renamer, input *Input, file string) ([]*Block, error) {
+func (c *Planner) handleFile(logE *logrus.Entry, renamer Renamer, input *types.Input, file string) ([]*types.Block, error) {
 	logE.Debug("reading a tf file")
 	b, err := afero.ReadFile(c.fs, file)
 	if err != nil {
@@ -79,7 +80,7 @@ func (c *Planner) handleFile(logE *logrus.Entry, renamer Renamer, input *Input, 
 		logE.Debug("no resource or module block is found")
 		return nil, nil
 	}
-	arr := []*Block{}
+	arr := []*types.Block{}
 	movedFile := getMovedFile(file, input.MovedFile)
 	for _, block := range blocks {
 		logE := logE.WithFields(logrus.Fields{
@@ -106,4 +107,12 @@ func (c *Planner) handleFile(logE *logrus.Entry, renamer Renamer, input *Input, 
 		arr = append(arr, block)
 	}
 	return arr, nil
+}
+
+// getMovedFile returns a file path where moved blocks are written.
+func getMovedFile(file, dest string) string {
+	if dest == "same" {
+		dest = filepath.Base(file)
+	}
+	return filepath.Join(filepath.Dir(file), dest)
 }
