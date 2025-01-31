@@ -1,4 +1,3 @@
-
 moved {
   from = github_repository.test-1
   to   = github_repository.example-1

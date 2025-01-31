@@ -35,5 +35,4 @@ func core(logE *logrus.Entry) error {
 		LogE: logE,
 	}
 	return runner.Run() //nolint:wrapcheck
-
 }
