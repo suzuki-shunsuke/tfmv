@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/google/go-jsonnet v0.20.0
-	github.com/hashicorp/hcl/v2 v2.21.0
+	github.com/hashicorp/hcl/v2 v2.23.0
 	github.com/lintnet/go-jsonnet-native-functions v0.4.1
 	github.com/mattn/go-colorable v0.1.14
 	github.com/minamijoyo/hcledit v0.2.15
