@@ -7,7 +7,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.23.0
 	github.com/lintnet/go-jsonnet-native-functions v0.4.1
 	github.com/mattn/go-colorable v0.1.14
-	github.com/minamijoyo/hcledit v0.2.15
+	github.com/minamijoyo/hcledit v0.2.16
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/afero v1.12.0
 	github.com/spf13/pflag v1.0.6
