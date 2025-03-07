@@ -14,7 +14,6 @@ jobs:
       - test
   test:
     uses: ./.github/workflows/wc-test.yaml
-    needs: path-filter
     permissions: {}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
