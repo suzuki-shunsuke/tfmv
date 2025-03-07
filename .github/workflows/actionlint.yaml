@@ -12,4 +12,4 @@ jobs:
       pull-requests: write
       contents: read
     steps:
-      - uses: suzuki-shunsuke/actionlint-action@ef913b89058e81a18703bb8db1ab70c51d82523a # v0.0.1
+      - uses: suzuki-shunsuke/actionlint-action@fix-aqua-global-config
