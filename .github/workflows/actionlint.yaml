@@ -1,15 +1,19 @@
 ---
 name: actionlint
-on:
-  pull_request:
-    paths:
-      - .github/workflows/*.yaml
+on: pull_request
+permissions: {}
 jobs:
-  status-check:
+  actionlint:
     runs-on: ubuntu-24.04
+    if: failure()
     timeout-minutes: 10
+    permissions: {}
+    needs:
+      - main
+    steps:
+      - run: exit 1
+  main:
+    uses: suzuki-shunsuke/actionlint-workflow/.github/workflows/actionlint.yaml@1af1919efef445ad960f5ab4cf370e47e961d721 # v2.0.0
     permissions:
       pull-requests: write
       contents: read
-    steps:
-      - uses: suzuki-shunsuke/actionlint-action@66efc7d429734a9843e4f31ab23a19a2d6f67c12 # v0.0.3
