@@ -1,21 +1,43 @@
----
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
+    - depguard
     - err113
-    - wsl
-    - lll
-    - godot
-    - nlreturn
-    - godox
-    - tagliatelle
-    - ireturn
-    - varnamelen
     - exhaustive
     - exhaustruct
-    - nonamedreturns
-    - musttag
-    - depguard
-    - tagalign
+    - godot
+    - godox
     - gomoddirectives
-    - exportloopref # WARN The linter 'exportloopref' is deprecated (since v1.60.2) due to: Since Go1.22 (loopvar) this linter is no longer relevant. Replaced by copyloopvar.
+    - ireturn
+    - lll
+    - musttag
+    - nlreturn
+    - nonamedreturns
+    - tagalign
+    - tagliatelle
+    - varnamelen
+    - wsl
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
