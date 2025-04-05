@@ -15,6 +15,3 @@ jobs:
   test:
     uses: ./.github/workflows/wc-test.yaml
     permissions: {}
-    secrets:
-      gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
