@@ -1,12 +1,6 @@
 ---
 name: wc-test
-on:
-  workflow_call:
-    secrets:
-      gh_app_id:
-        required: true
-      gh_app_private_key:
-        required: true
+on: workflow_call
 
 jobs:
   test:
