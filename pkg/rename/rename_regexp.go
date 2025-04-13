@@ -27,7 +27,12 @@ func NewRegexpRenamer(s string) (*RegexpRenamer, error) {
 	return &RegexpRenamer{regexp: r, new: n}, nil
 }
 
-// Rename renames a block address.
-func (r *RegexpRenamer) Rename(block *types.Block) (string, error) {
+// RenameName renames a block address.
+func (r *RegexpRenamer) RenameName(block *types.Block) (string, error) {
 	return r.regexp.ReplaceAllString(block.Name, r.new), nil
+}
+
+// RenameResourceType renames a block address.
+func (r *RegexpRenamer) RenameResourceType(block *types.Block) (string, error) {
+	return r.regexp.ReplaceAllString(block.ResourceType, r.new), nil
 }
