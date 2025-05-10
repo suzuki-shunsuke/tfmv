@@ -3,7 +3,7 @@ module github.com/suzuki-shunsuke/tfmv
 go 1.23.4
 
 require (
-	github.com/google/go-jsonnet v0.20.0
+	github.com/google/go-jsonnet v0.21.0
 	github.com/hashicorp/hcl/v2 v2.23.1-0.20250211201033-5c140ce1cb20
 	github.com/lintnet/go-jsonnet-native-functions v0.4.1
 	github.com/mattn/go-colorable v0.1.14
