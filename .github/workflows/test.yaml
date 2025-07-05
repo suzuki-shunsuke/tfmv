@@ -9,7 +9,7 @@ jobs:
   status-check:
     uses: ./.github/workflows/wc-status-check.yaml
     permissions: {}
-    if: failure()
+    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
     needs:
       - test
   test:
