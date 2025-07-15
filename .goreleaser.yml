@@ -7,6 +7,10 @@ archives:
     format_overrides:
       - goos: windows
         formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+      - third_party_licenses/**/*
 
 builds:
   - binary: tfmv

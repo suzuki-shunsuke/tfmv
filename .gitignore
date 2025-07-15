@@ -2,3 +2,4 @@
 .envrc
 .terraform
 .terraform.lock.hcl
+third_party_licenses
