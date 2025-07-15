@@ -1,8 +1,6 @@
 module github.com/suzuki-shunsuke/tfmv
 
-go 1.23.7
-
-toolchain go1.24.5
+go 1.24.5
 
 require (
 	github.com/google/go-jsonnet v0.21.0
@@ -15,8 +13,6 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/suzuki-shunsuke/logrus-error v0.1.4
 )
-
-replace github.com/google/go-jsonnet v0.20.0 => github.com/lintnet/go-jsonnet v0.20.2
 
 require (
 	github.com/agext/levenshtein v1.2.1 // indirect
