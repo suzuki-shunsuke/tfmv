@@ -9,3 +9,4 @@ registries:
     ref: v4.386.0 # renovate: depName=aquaproj/aqua-registry
 packages:
   - import: imports/*.yaml
+  - name: anchore/syft@v1.28.0
