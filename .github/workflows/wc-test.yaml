@@ -1,11 +1,19 @@
 ---
 name: wc-test
 on: workflow_call
-
 jobs:
   test:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
+    uses: suzuki-shunsuke/go-test-full-workflow/.github/workflows/test.yaml@3429e3ed1cb719d01112a04a07ff8754510cd9df # v4.0.0
+    with:
+      aqua_version: v2.53.9
+      golangci-lint-timeout: 120s
+    permissions:
+      pull-requests: write
+      contents: read
+
+  integration-test:
+    timeout-minutes: 20
+    runs-on: ubuntu-24.04
     permissions: {}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -17,10 +25,6 @@ jobs:
       - uses: aquaproj/aqua-installer@d1fe50798dbadd4eb5b98957290ca175f6b4870f # v4.0.2
         with:
           aqua_version: v2.53.9
-      - run: golangci-lint run --timeout 120s
-        env:
-          AQUA_GITHUB_TOKEN: ${{github.token}}
-      - run: go test -v ./... -race -covermode=atomic
       - run: go install ./cmd/tfmv
       - run: tfmv --version
       - run: tfmv --help
