@@ -27,7 +27,7 @@ type Block struct {
 	MovedFile string `json:"-"`
 	// Regexp is a regular expression to capture a resource reference.
 	Regexp *regexp.Regexp `json:"-"`
-	// TFAdress is a Terraform address such as "aws_instance.foo"
+	// TFAddress is a Terraform address such as "aws_instance.foo"
 	TFAddress string `json:"-"`
 	// HCLAddress is a HCL address such as "resource.aws_instance.foo"
 	// hcledit uses this address rather than TFAddress.
