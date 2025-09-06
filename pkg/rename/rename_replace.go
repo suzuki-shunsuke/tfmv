@@ -23,7 +23,17 @@ func NewReplaceRenamer(s string) (*ReplaceRenamer, error) {
 	return &ReplaceRenamer{old: o, new: n}, nil
 }
 
-// Rename renames a block address.
-func (r *ReplaceRenamer) Rename(block *types.Block) (string, error) {
+// RenameName renames a block name.
+func (r *ReplaceRenamer) RenameName(block *types.Block) (string, error) {
 	return strings.ReplaceAll(block.Name, r.old, r.new), nil
+}
+
+// RenameResourceType renames a block resource type.
+func (r *ReplaceRenamer) RenameResourceType(block *types.Block) (string, error) {
+	return strings.ReplaceAll(block.ResourceType, r.old, r.new), nil
+}
+
+// RenameAddress renames a block address.
+func (r *ReplaceRenamer) RenameAddress(block *types.Block) (string, error) {
+	return strings.ReplaceAll(block.TFAddress, r.old, r.new), nil
 }

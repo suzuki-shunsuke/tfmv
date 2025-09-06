@@ -34,6 +34,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 				Args:    []string{"main.tf"},
 				Replace: "-/_",
 				DryRun:  true,
+				Type:    "name",
 			},
 		},
 		{
@@ -48,6 +49,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 				Args:    []string{"testdata/main.tf"},
 				Replace: "-/_",
 				DryRun:  true,
+				Type:    "name",
 			},
 		},
 		{
@@ -62,6 +64,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 				Args:   []string{"testdata/main.tf"},
 				Regexp: "^example-/test-",
 				DryRun: true,
+				Type:   "name",
 			},
 		},
 		{
@@ -78,6 +81,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 				Args:    []string{"testdata/main.tf"},
 				Jsonnet: "main.jsonnet",
 				DryRun:  true,
+				Type:    "name",
 			},
 		},
 		{
@@ -88,8 +92,10 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			},
 			stdout: &bytes.Buffer{},
 			stderr: &bytes.Buffer{},
-			input:  &types.Input{},
-			isErr:  true,
+			input: &types.Input{
+				Type: "name",
+			},
+			isErr: true,
 		},
 		{
 			name:   "no file is found",
@@ -98,6 +104,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			stderr: &bytes.Buffer{},
 			input: &types.Input{
 				Replace: "-/_",
+				Type:    "name",
 			},
 		},
 	}

@@ -11,7 +11,8 @@ type Input struct {
 	Replace string
 	// Regexp is a regexp option.
 	Regexp string
-	// Include is an include option.
+	// Type is either 'name' or 'type'
+	Type    string
 	Include *regexp.Regexp
 	// Exclude is an exclude option.
 	Exclude *regexp.Regexp
