@@ -10,7 +10,7 @@ require (
 	github.com/minamijoyo/hcledit v0.2.17
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/afero v1.14.0
-	github.com/spf13/pflag v1.0.7
+	github.com/spf13/pflag v1.0.10
 	github.com/suzuki-shunsuke/logrus-error v0.1.4
 )
 
