@@ -9,7 +9,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14
 	github.com/minamijoyo/hcledit v0.2.17
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/afero v1.14.0
+	github.com/spf13/afero v1.15.0
 	github.com/spf13/pflag v1.0.10
 	github.com/suzuki-shunsuke/logrus-error v0.1.4
 )
@@ -24,10 +24,10 @@ require (
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/zclconf/go-cty v1.16.3 // indirect
 	golang.org/x/crypto v0.38.0 // indirect
-	golang.org/x/mod v0.18.0 // indirect
-	golang.org/x/sync v0.14.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.25.0 // indirect
-	golang.org/x/tools v0.22.0 // indirect
+	golang.org/x/mod v0.26.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/tools v0.35.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
