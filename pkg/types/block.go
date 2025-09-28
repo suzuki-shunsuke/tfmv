@@ -43,7 +43,7 @@ func isResource(blockType string) bool {
 	return blockType == wordResource
 }
 
-// isResource returns true if the block type is "resource".
+// IsResource returns true if the block type is "resource".
 func (b *Block) IsResource() bool {
 	return isResource(b.BlockType)
 }
@@ -87,7 +87,7 @@ func tfAddress(blockType, resourceType, name string) string {
 	return ""
 }
 
-// Regestr returns a regular expression to capture a resource reference.
+// Regstr returns a regular expression to capture a resource reference.
 func (b *Block) Regstr() string {
 	// A name must start with a letter or underscore and may contain only letters, digits, underscores, and dashes.
 	switch b.BlockType {
