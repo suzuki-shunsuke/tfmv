@@ -36,7 +36,15 @@ func NewJsonnetRenamer(logE *logrus.Entry, fs afero.Fs, file string) (*JsonnetRe
 	return &JsonnetRenamer{node: node}, nil
 }
 
-func (j *JsonnetRenamer) Rename(block *types.Block) (string, error) {
+func (j *JsonnetRenamer) RenameName(block *types.Block) (string, error) {
+	return j.rename(block)
+}
+
+func (j *JsonnetRenamer) RenameResourceType(block *types.Block) (string, error) {
+	return j.rename(block)
+}
+
+func (j *JsonnetRenamer) rename(block *types.Block) (string, error) {
 	b, err := json.Marshal(block)
 	if err != nil {
 		return "", fmt.Errorf("marshal a block: %w", err)
