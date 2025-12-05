@@ -9,7 +9,7 @@ require (
 	github.com/minamijoyo/hcledit v0.2.17
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/pflag v1.0.10
-	github.com/suzuki-shunsuke/slog-error v0.2.0
+	github.com/suzuki-shunsuke/slog-error v0.2.1
 	github.com/suzuki-shunsuke/slog-util v0.2.1
 )
 
