@@ -3,9 +3,9 @@ package apply
 import (
 	"fmt"
 	"io"
+	"log/slog"
 
 	"github.com/minamijoyo/hcledit/editor"
-	"github.com/sirupsen/logrus"
 )
 
 type Editor struct {
@@ -25,7 +25,7 @@ type MoveBlockOpt struct {
 	Update bool
 }
 
-func (e *Editor) Move(logE *logrus.Entry, opt *MoveBlockOpt) error {
+func (e *Editor) Move(logger *slog.Logger, opt *MoveBlockOpt) error {
 	filter := editor.NewBlockRenameFilter(opt.From, opt.To)
 
 	if e.dryRun {
@@ -34,7 +34,7 @@ func (e *Editor) Move(logE *logrus.Entry, opt *MoveBlockOpt) error {
 			OutStream: io.Discard,
 			ErrStream: e.stderr,
 		})
-		logE.Debug("[DRY RUN] moving a block")
+		logger.Debug("[DRY RUN] moving a block")
 		if err := cl.Edit(opt.FilePath, false, filter); err != nil {
 			return fmt.Errorf("move a block in %s from %s to %s: %w", opt.FilePath, opt.From, opt.To, err)
 		}
@@ -45,7 +45,7 @@ func (e *Editor) Move(logE *logrus.Entry, opt *MoveBlockOpt) error {
 		OutStream: opt.Stdout,
 		ErrStream: e.stderr,
 	})
-	logE.Debug("moving a block")
+	logger.Debug("moving a block")
 	if err := cl.Edit(opt.FilePath, opt.Update, filter); err != nil {
 		return fmt.Errorf("move a block in %s from %s to %s: %w", opt.FilePath, opt.From, opt.To, err)
 	}
