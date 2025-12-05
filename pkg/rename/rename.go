@@ -2,8 +2,8 @@ package rename
 
 import (
 	"errors"
+	"log/slog"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
@@ -14,12 +14,12 @@ type Renamer interface {
 }
 
 // New creates a Renamer.
-func New(logE *logrus.Entry, fs afero.Fs, input *types.Input) (Renamer, error) {
+func New(logger *slog.Logger, fs afero.Fs, input *types.Input) (Renamer, error) {
 	if input.Replace != "" {
 		return NewReplaceRenamer(input.Replace)
 	}
 	if input.Jsonnet != "" {
-		return NewJsonnetRenamer(logE, fs, input.Jsonnet)
+		return NewJsonnetRenamer(logger, fs, input.Jsonnet)
 	}
 	if input.Regexp != "" {
 		return NewRegexpRenamer(input.Regexp)
