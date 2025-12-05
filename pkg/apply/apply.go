@@ -3,11 +3,11 @@ package apply
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
-	"github.com/suzuki-shunsuke/logrus-error/logerr"
+	"github.com/suzuki-shunsuke/slog-error/slogerr"
 	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
@@ -23,13 +23,13 @@ func New(fs afero.Fs, stderr io.Writer) *Applier {
 	}
 }
 
-func (a *Applier) Apply(logE *logrus.Entry, input *types.Input, dirs map[string]*types.Dir) error {
+func (a *Applier) Apply(logger *slog.Logger, input *types.Input, dirs map[string]*types.Dir) error {
 	editor := &Editor{
 		stderr: a.stderr,
 		dryRun: input.DryRun,
 	}
 	for _, dir := range dirs {
-		if err := a.handleDir(logE, editor, input, dir); err != nil {
+		if err := a.handleDir(logger, editor, input, dir); err != nil {
 			return err
 		}
 	}
@@ -37,20 +37,20 @@ func (a *Applier) Apply(logE *logrus.Entry, input *types.Input, dirs map[string]
 }
 
 // handleDir modifies files in a given directory.
-func (a *Applier) handleDir(logE *logrus.Entry, editor *Editor, input *types.Input, dir *types.Dir) error {
+func (a *Applier) handleDir(logger *slog.Logger, editor *Editor, input *types.Input, dir *types.Dir) error {
 	// fix references
-	if err := a.fixRef(logE, dir, input); err != nil {
+	if err := a.fixRef(logger, dir, input); err != nil {
 		return err
 	}
 	for _, block := range dir.Blocks {
 		// change resource addresses by hcledit
 		// generate moved blocks
-		logE := logE.WithFields(logrus.Fields{
-			"address":     block.TFAddress,
-			"new_address": block.NewTFAddress,
-			"file":        block.File,
-		})
-		if err := a.handleBlock(logE, editor, input, block); err != nil {
+		logger := logger.With(
+			"address", block.TFAddress,
+			"new_address", block.NewTFAddress,
+			"file", block.File,
+		)
+		if err := a.handleBlock(logger, editor, input, block); err != nil {
 			return err
 		}
 	}
@@ -64,7 +64,7 @@ func applyFixes(body string, blocks []*types.Block) string {
 	return body
 }
 
-func (a *Applier) fixRef(logE *logrus.Entry, dir *types.Dir, input *types.Input) error {
+func (a *Applier) fixRef(logger *slog.Logger, dir *types.Dir, input *types.Input) error {
 	files := dir.Files
 	if len(input.Args) != 0 {
 		arr, err := afero.Glob(a.fs, filepath.Join(dir.Path, "*.tf"))
@@ -74,10 +74,9 @@ func (a *Applier) fixRef(logE *logrus.Entry, dir *types.Dir, input *types.Input)
 		files = arr
 	}
 	for _, file := range files {
-		fields := logrus.Fields{"file": file}
 		b, err := afero.ReadFile(a.fs, file)
 		if err != nil {
-			return fmt.Errorf("read a file: %w", logerr.WithFields(err, fields))
+			return fmt.Errorf("read a file: %w", slogerr.With(err, "file", file))
 		}
 		orig := string(b)
 		s := applyFixes(orig, dir.Blocks)
@@ -86,14 +85,14 @@ func (a *Applier) fixRef(logE *logrus.Entry, dir *types.Dir, input *types.Input)
 		}
 		f, err := a.fs.Stat(file)
 		if err != nil {
-			return fmt.Errorf("get a file stat: %w", logerr.WithFields(err, fields))
+			return fmt.Errorf("get a file stat: %w", slogerr.With(err, "file", file))
 		}
 		if input.DryRun {
-			logE.WithFields(fields).Debug("[DRY RUN] fixing references")
+			logger.Debug("[DRY RUN] fixing references", "file", file)
 		} else {
-			logE.WithFields(fields).Debug("fixing references")
+			logger.Debug("fixing references", "file", file)
 			if err := afero.WriteFile(a.fs, file, []byte(s), f.Mode()); err != nil {
-				return fmt.Errorf("write a file: %w", logerr.WithFields(err, fields))
+				return fmt.Errorf("write a file: %w", slogerr.With(err, "file", file))
 			}
 		}
 	}
@@ -101,13 +100,13 @@ func (a *Applier) fixRef(logE *logrus.Entry, dir *types.Dir, input *types.Input)
 }
 
 // handleBlock generates a moved block and renames a block.
-func (a *Applier) handleBlock(logE *logrus.Entry, editor *Editor, input *types.Input, block *types.Block) error {
+func (a *Applier) handleBlock(logger *slog.Logger, editor *Editor, input *types.Input, block *types.Block) error {
 	// generate moved blocks
 	if !block.IsData() {
 		if input.DryRun {
-			logE.WithField("moved_file", block.MovedFile).Debug("[DRY RUN] generate a moved block")
+			logger.Debug("[DRY RUN] generate a moved block", "moved_file", block.MovedFile)
 		} else {
-			logE.WithField("moved_file", block.MovedFile).Debug("writing a moved block")
+			logger.Debug("writing a moved block", "moved_file", block.MovedFile)
 			if err := a.writeMovedBlock(block, block.MovedFile); err != nil {
 				return fmt.Errorf("write a moved block: %w", err)
 			}
@@ -115,7 +114,7 @@ func (a *Applier) handleBlock(logE *logrus.Entry, editor *Editor, input *types.I
 	}
 
 	// rename resources
-	if err := editor.Move(logE, &MoveBlockOpt{
+	if err := editor.Move(logger, &MoveBlockOpt{
 		From:     block.HCLAddress,
 		To:       block.NewHCLAddress,
 		FilePath: block.File,
