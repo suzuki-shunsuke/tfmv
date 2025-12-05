@@ -3,10 +3,10 @@ package controller_test
 import (
 	"bytes"
 	"io"
+	"log/slog"
 	"path/filepath"
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/tfmv/pkg/controller"
 	"github.com/suzuki-shunsuke/tfmv/pkg/types"
@@ -101,7 +101,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			},
 		},
 	}
-	logE := logrus.NewEntry(logrus.New())
+	logger := slog.New(slog.DiscardHandler)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -116,7 +116,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			}
 			ctrl := &controller.Controller{}
 			ctrl.Init(fs, tt.stdout, tt.stderr)
-			if err := ctrl.Run(logE, tt.input); err != nil {
+			if err := ctrl.Run(logger, tt.input); err != nil {
 				if tt.isErr {
 					return
 				}
