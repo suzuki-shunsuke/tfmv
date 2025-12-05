@@ -3,6 +3,7 @@ package rename
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/go-jsonnet"
 	"github.com/google/go-jsonnet/ast"
@@ -11,7 +12,6 @@ import (
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/path/filepath"
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/regexp"
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/strings"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
@@ -20,15 +20,15 @@ type JsonnetRenamer struct {
 	node ast.Node
 }
 
-func NewJsonnetRenamer(logE *logrus.Entry, fs afero.Fs, file string) (*JsonnetRenamer, error) {
+func NewJsonnetRenamer(logger *slog.Logger, fs afero.Fs, file string) (*JsonnetRenamer, error) {
 	// read Jsonnet
-	logE.Debug("reading a jsonnet file")
+	logger.Debug("reading a jsonnet file")
 	b, err := afero.ReadFile(fs, file)
 	if err != nil {
 		return nil, fmt.Errorf("read a jsonnet file: %w", err)
 	}
 	// parse Jsonnet
-	logE.Debug("parsing a jsonnet file")
+	logger.Debug("parsing a jsonnet file")
 	node, err := jsonnet.SnippetToAST(file, string(b))
 	if err != nil {
 		return nil, fmt.Errorf("parse a jsonnet file: %w", err)

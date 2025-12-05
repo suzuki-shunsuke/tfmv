@@ -3,9 +3,9 @@ name: wc-test
 on: workflow_call
 jobs:
   test:
-    uses: suzuki-shunsuke/go-test-full-workflow/.github/workflows/test.yaml@3429e3ed1cb719d01112a04a07ff8754510cd9df # v4.0.0
+    uses: suzuki-shunsuke/go-test-full-workflow/.github/workflows/test.yaml@596bc52a7f02dd896d3351e61e4dfa661c1f3304 # v5.0.1
     with:
-      aqua_version: v2.55.0
+      aqua_version: v2.55.2
       golangci-lint-timeout: 120s
     permissions:
       pull-requests: write
@@ -16,15 +16,15 @@ jobs:
     runs-on: ubuntu-24.04
     permissions: {}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           persist-credentials: false
-      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+      - uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
           go-version-file: go.mod
-      - uses: aquaproj/aqua-installer@ea518c135a02fc11ff8024364510c181a5c6b342 # v4.0.3
+      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
         with:
-          aqua_version: v2.55.0
+          aqua_version: v2.55.2
       - run: go install ./cmd/tfmv
       - run: tfmv --version
       - run: tfmv --help
