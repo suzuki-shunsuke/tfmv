@@ -4,15 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"path/filepath"
 	"regexp"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	flag "github.com/spf13/pflag"
+	"github.com/suzuki-shunsuke/slog-util/slogutil"
 	"github.com/suzuki-shunsuke/tfmv/pkg/controller"
-	"github.com/suzuki-shunsuke/tfmv/pkg/log"
 	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
@@ -35,15 +35,15 @@ Options:
 	--exclude        A regular expression to filter resources. Only resources that don't match the regular expression are renamed
 	--dry-run        Dry Run
 	--log-level      Log level
-	--log-color      Log color. "auto", "always", "never" are available
 	--moved, -m      A file name where moved blocks are written. If this is "same", the file is same with renamed resources`
 
 type Runner struct {
-	Stdin   io.Reader
-	Stdout  io.Writer
-	Stderr  io.Writer
-	LDFlags *LDFlags
-	LogE    *logrus.Entry
+	Stdin       io.Reader
+	Stdout      io.Writer
+	Stderr      io.Writer
+	LDFlags     *LDFlags
+	Logger      *slog.Logger
+	LogLevelVar *slog.LevelVar
 }
 
 type LDFlags struct {
@@ -63,8 +63,9 @@ func (r *Runner) Run() error {
 		fmt.Fprintln(r.Stdout, help)
 		return nil
 	}
-	log.SetColor(flg.LogColor, r.LogE)
-	log.SetLevel(flg.LogLevel, r.LogE)
+	if err := slogutil.SetLevel(r.LogLevelVar, flg.LogLevel); err != nil {
+		return fmt.Errorf("set log level: %w", err)
+	}
 	if flg.Moved != "same" {
 		if !strings.HasSuffix(flg.Moved, ".tf") {
 			return errors.New("--moved name must be either 'same' or a file name with the suffix .tf")
@@ -86,7 +87,7 @@ func (r *Runner) Run() error {
 
 	ctrl := &controller.Controller{}
 	ctrl.Init(afero.NewOsFs(), r.Stdout, r.Stderr)
-	return ctrl.Run(r.LogE, &types.Input{ //nolint:wrapcheck
+	return ctrl.Run(r.Logger, &types.Input{ //nolint:wrapcheck
 		Jsonnet:   flg.Jsonnet,
 		MovedFile: flg.Moved,
 		Recursive: flg.Recursive,
@@ -110,7 +111,6 @@ type Flag struct {
 	Jsonnet   string
 	Moved     string
 	LogLevel  string
-	LogColor  string
 	Replace   string
 	Regexp    string
 	Include   string
@@ -130,7 +130,6 @@ func parseFlags(f *Flag) {
 	flag.StringVar(&f.Include, "include", "", "A regular expression to filter resources")
 	flag.StringVar(&f.Exclude, "exclude", "", "A regular expression to filter resources")
 	flag.StringVar(&f.LogLevel, "log-level", "info", "The log level")
-	flag.StringVar(&f.LogColor, "log-color", "auto", "The log color")
 	flag.BoolVarP(&f.Help, "help", "h", false, "Show help")
 	flag.BoolVarP(&f.Version, "version", "v", false, "Show version")
 	flag.BoolVarP(&f.Recursive, "recursive", "R", false, "If this is set, tfmv finds files recursively")
