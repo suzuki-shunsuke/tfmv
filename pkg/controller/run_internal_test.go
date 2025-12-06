@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/tfmv/pkg/controller"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 )
 
 func TestController_Run(t *testing.T) { //nolint:funlen
@@ -19,7 +19,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 		files  map[string]string
 		stdout io.Writer
 		stderr io.Writer
-		input  *types.Input
+		input  *domain.Input
 		isErr  bool
 	}{
 		{
@@ -30,7 +30,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			},
 			stdout: &bytes.Buffer{},
 			stderr: &bytes.Buffer{},
-			input: &types.Input{
+			input: &domain.Input{
 				Args:    []string{"main.tf"},
 				Replace: "-/_",
 				DryRun:  true,
@@ -44,7 +44,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			},
 			stdout: &bytes.Buffer{},
 			stderr: &bytes.Buffer{},
-			input: &types.Input{
+			input: &domain.Input{
 				Args:    []string{"testdata/main.tf"},
 				Replace: "-/_",
 				DryRun:  true,
@@ -58,7 +58,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			},
 			stdout: &bytes.Buffer{},
 			stderr: &bytes.Buffer{},
-			input: &types.Input{
+			input: &domain.Input{
 				Args:   []string{"testdata/main.tf"},
 				Regexp: "^example-/test-",
 				DryRun: true,
@@ -74,7 +74,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			},
 			stdout: &bytes.Buffer{},
 			stderr: &bytes.Buffer{},
-			input: &types.Input{
+			input: &domain.Input{
 				Args:    []string{"testdata/main.tf"},
 				Jsonnet: "main.jsonnet",
 				DryRun:  true,
@@ -88,7 +88,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			},
 			stdout: &bytes.Buffer{},
 			stderr: &bytes.Buffer{},
-			input:  &types.Input{},
+			input:  &domain.Input{},
 			isErr:  true,
 		},
 		{
@@ -96,7 +96,7 @@ func TestController_Run(t *testing.T) { //nolint:funlen
 			files:  map[string]string{},
 			stdout: &bytes.Buffer{},
 			stderr: &bytes.Buffer{},
-			input: &types.Input{
+			input: &domain.Input{
 				Replace: "-/_",
 			},
 		},

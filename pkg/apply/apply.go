@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/slog-error/slogerr"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 )
 
 type Applier struct {
@@ -23,7 +23,7 @@ func New(fs afero.Fs, stderr io.Writer) *Applier {
 	}
 }
 
-func (a *Applier) Apply(logger *slog.Logger, input *types.Input, dirs map[string]*types.Dir) error {
+func (a *Applier) Apply(logger *slog.Logger, input *domain.Input, dirs map[string]*domain.Dir) error {
 	editor := &Editor{
 		stderr: a.stderr,
 		dryRun: input.DryRun,
@@ -37,7 +37,7 @@ func (a *Applier) Apply(logger *slog.Logger, input *types.Input, dirs map[string
 }
 
 // handleDir modifies files in a given directory.
-func (a *Applier) handleDir(logger *slog.Logger, editor *Editor, input *types.Input, dir *types.Dir) error {
+func (a *Applier) handleDir(logger *slog.Logger, editor *Editor, input *domain.Input, dir *domain.Dir) error {
 	// fix references
 	if err := a.fixRef(logger, dir, input); err != nil {
 		return err
@@ -57,14 +57,14 @@ func (a *Applier) handleDir(logger *slog.Logger, editor *Editor, input *types.In
 	return nil
 }
 
-func applyFixes(body string, blocks []*types.Block) string {
+func applyFixes(body string, blocks []*domain.Block) string {
 	for _, b := range blocks {
 		body = b.Fix(body)
 	}
 	return body
 }
 
-func (a *Applier) fixRef(logger *slog.Logger, dir *types.Dir, input *types.Input) error {
+func (a *Applier) fixRef(logger *slog.Logger, dir *domain.Dir, input *domain.Input) error {
 	files := dir.Files
 	if len(input.Args) != 0 {
 		arr, err := afero.Glob(a.fs, filepath.Join(dir.Path, "*.tf"))
@@ -100,7 +100,7 @@ func (a *Applier) fixRef(logger *slog.Logger, dir *types.Dir, input *types.Input
 }
 
 // handleBlock generates a moved block and renames a block.
-func (a *Applier) handleBlock(logger *slog.Logger, editor *Editor, input *types.Input, block *types.Block) error {
+func (a *Applier) handleBlock(logger *slog.Logger, editor *Editor, input *domain.Input, block *domain.Block) error {
 	// generate moved blocks
 	if !block.IsData() {
 		if input.DryRun {

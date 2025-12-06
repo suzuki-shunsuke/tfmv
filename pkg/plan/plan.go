@@ -9,8 +9,8 @@ import (
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/slog-error/slogerr"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 	"github.com/suzuki-shunsuke/tfmv/pkg/rename"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
 type Planner struct {
@@ -23,7 +23,7 @@ func NewPlanner(fs afero.Fs) *Planner {
 	}
 }
 
-func (c *Planner) Plan(logger *slog.Logger, input *types.Input) (map[string]*types.Dir, error) {
+func (c *Planner) Plan(logger *slog.Logger, input *domain.Input) (map[string]*domain.Dir, error) {
 	renamer, err := rename.New(logger, c.fs, input)
 	if err != nil {
 		return nil, fmt.Errorf("initialize a renamer: %w", err)
@@ -42,14 +42,14 @@ func (c *Planner) Plan(logger *slog.Logger, input *types.Input) (map[string]*typ
 	logger.Debug("found tf files", "num_of_files", len(files))
 
 	// read *.tf
-	dirs := map[string]*types.Dir{}
+	dirs := map[string]*domain.Dir{}
 	for _, file := range files {
 		logger := logger.With("file", file)
 		logger.Debug("handling a file")
 		dirPath := filepath.Dir(file)
 		dir, ok := dirs[dirPath]
 		if !ok {
-			dir = &types.Dir{Path: dirPath}
+			dir = &domain.Dir{Path: dirPath}
 			dirs[dirPath] = dir
 		}
 		dir.Files = append(dir.Files, file)
@@ -64,7 +64,7 @@ func (c *Planner) Plan(logger *slog.Logger, input *types.Input) (map[string]*typ
 
 // handleFile reads and parses a file and returns renamed blocks.
 // handleFile doesn't actually edit a file.
-func (c *Planner) handleFile(logger *slog.Logger, renamer rename.Renamer, input *types.Input, file string) ([]*types.Block, error) {
+func (c *Planner) handleFile(logger *slog.Logger, renamer rename.Renamer, input *domain.Input, file string) ([]*domain.Block, error) {
 	logger.Debug("reading a tf file")
 	b, err := afero.ReadFile(c.fs, file)
 	if err != nil {
@@ -79,7 +79,7 @@ func (c *Planner) handleFile(logger *slog.Logger, renamer rename.Renamer, input 
 		logger.Debug("no resource or module block is found")
 		return nil, nil
 	}
-	arr := []*types.Block{}
+	arr := []*domain.Block{}
 	movedFile := getMovedFile(file, input.MovedFile)
 	for _, block := range blocks {
 		logger := logger.With(

@@ -5,16 +5,16 @@ import (
 	"log/slog"
 
 	"github.com/spf13/afero"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 )
 
 // Renamer is an interface to rename a block address.
 type Renamer interface {
-	Rename(block *types.Block) (string, error)
+	Rename(block *domain.Block) (string, error)
 }
 
 // New creates a Renamer.
-func New(logger *slog.Logger, fs afero.Fs, input *types.Input) (Renamer, error) {
+func New(logger *slog.Logger, fs afero.Fs, input *domain.Input) (Renamer, error) {
 	if input.Replace != "" {
 		return NewReplaceRenamer(input.Replace)
 	}

@@ -5,12 +5,12 @@ import (
 	"os"
 
 	"github.com/spf13/afero"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 )
 
 var filePermission os.FileMode = 0o644 //nolint:gochecknoglobals
 
-func (a *Applier) writeMovedBlock(block *types.Block, movedFile string) error {
+func (a *Applier) writeMovedBlock(block *domain.Block, movedFile string) error {
 	if block.IsData() {
 		return nil
 	}

@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/spf13/afero"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 )
 
-func (c *Planner) findFiles(input *types.Input) ([]string, error) {
+func (c *Planner) findFiles(input *domain.Input) ([]string, error) {
 	if len(input.Args) != 0 {
 		return input.Args, nil
 	}
