@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log/slog"
 	"os"
 
 	"github.com/suzuki-shunsuke/slog-error/slogerr"
@@ -22,12 +21,9 @@ func main() {
 }
 
 func core() int {
-	logLevelVar := &slog.LevelVar{}
 	logger := slogutil.New(&slogutil.InputNew{
 		Name:    "tfmv",
 		Version: version,
-		Out:     os.Stderr,
-		Level:   logLevelVar,
 	})
 	runner := cli.Runner{
 		Stdin:  os.Stdin,
@@ -38,11 +34,10 @@ func core() int {
 			Commit:  commit,
 			Date:    date,
 		},
-		Logger:      logger,
-		LogLevelVar: logLevelVar,
+		Logger: logger,
 	}
 	if err := runner.Run(); err != nil {
-		slogerr.WithError(logger, err).Error("tfmv failed")
+		slogerr.WithError(logger.Logger, err).Error("tfmv failed")
 		return 1
 	}
 	return 0

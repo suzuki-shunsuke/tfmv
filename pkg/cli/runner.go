@@ -35,6 +35,7 @@ Options:
 	--exclude        A regular expression to filter resources. Only resources that don't match the regular expression are renamed
 	--dry-run        Dry Run
 	--log-level      Log level
+	--log-color      Log color. "auto", "always", "never" are available
 	--moved, -m      A file name where moved blocks are written. If this is "same", the file is same with renamed resources`
 
 type Runner struct {
@@ -42,7 +43,7 @@ type Runner struct {
 	Stdout      io.Writer
 	Stderr      io.Writer
 	LDFlags     *LDFlags
-	Logger      *slog.Logger
+	Logger      *slogutil.Logger
 	LogLevelVar *slog.LevelVar
 }
 
@@ -63,8 +64,11 @@ func (r *Runner) Run() error {
 		fmt.Fprintln(r.Stdout, help)
 		return nil
 	}
-	if err := slogutil.SetLevel(r.LogLevelVar, flg.LogLevel); err != nil {
+	if err := r.Logger.SetLevel(flg.LogLevel); err != nil {
 		return fmt.Errorf("set log level: %w", err)
+	}
+	if err := r.Logger.SetColor(flg.LogColor); err != nil {
+		return fmt.Errorf("set log color: %w", err)
 	}
 	if flg.Moved != "same" {
 		if !strings.HasSuffix(flg.Moved, ".tf") {
@@ -87,7 +91,7 @@ func (r *Runner) Run() error {
 
 	ctrl := &controller.Controller{}
 	ctrl.Init(afero.NewOsFs(), r.Stdout, r.Stderr)
-	return ctrl.Run(r.Logger, &domain.Input{ //nolint:wrapcheck
+	return ctrl.Run(r.Logger.Logger, &domain.Input{ //nolint:wrapcheck
 		Jsonnet:   flg.Jsonnet,
 		MovedFile: flg.Moved,
 		Recursive: flg.Recursive,
@@ -111,6 +115,7 @@ type Flag struct {
 	Jsonnet   string
 	Moved     string
 	LogLevel  string
+	LogColor  string
 	Replace   string
 	Regexp    string
 	Include   string
@@ -130,6 +135,7 @@ func parseFlags(f *Flag) {
 	flag.StringVar(&f.Include, "include", "", "A regular expression to filter resources")
 	flag.StringVar(&f.Exclude, "exclude", "", "A regular expression to filter resources")
 	flag.StringVar(&f.LogLevel, "log-level", "info", "The log level")
+	flag.StringVar(&f.LogColor, "log-color", "auto", "The log color")
 	flag.BoolVarP(&f.Help, "help", "h", false, "Show help")
 	flag.BoolVarP(&f.Version, "version", "v", false, "Show version")
 	flag.BoolVarP(&f.Recursive, "recursive", "R", false, "If this is set, tfmv finds files recursively")
