@@ -13,7 +13,7 @@ import (
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/regexp"
 	"github.com/lintnet/go-jsonnet-native-functions/pkg/strings"
 	"github.com/spf13/afero"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 )
 
 type JsonnetRenamer struct {
@@ -36,7 +36,7 @@ func NewJsonnetRenamer(logger *slog.Logger, fs afero.Fs, file string) (*JsonnetR
 	return &JsonnetRenamer{node: node}, nil
 }
 
-func (j *JsonnetRenamer) Rename(block *types.Block) (string, error) {
+func (j *JsonnetRenamer) Rename(block *domain.Block) (string, error) {
 	b, err := json.Marshal(block)
 	if err != nil {
 		return "", fmt.Errorf("marshal a block: %w", err)

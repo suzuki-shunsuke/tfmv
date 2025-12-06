@@ -7,11 +7,11 @@ import (
 
 	"github.com/suzuki-shunsuke/slog-error/slogerr"
 	"github.com/suzuki-shunsuke/tfmv/pkg/apply"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 	"github.com/suzuki-shunsuke/tfmv/pkg/plan"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
 )
 
-func (c *Controller) Run(logger *slog.Logger, input *types.Input) error {
+func (c *Controller) Run(logger *slog.Logger, input *domain.Input) error {
 	planner := plan.NewPlanner(c.fs)
 	dirs, err := planner.Plan(logger, input)
 	if err != nil {
@@ -30,7 +30,7 @@ func (c *Controller) Run(logger *slog.Logger, input *types.Input) error {
 }
 
 // summarize outputs a summary of changes as JSON to stdout.
-func (c *Controller) summarize(dirs map[string]*types.Dir) error {
+func (c *Controller) summarize(dirs map[string]*domain.Dir) error {
 	summary := &Summary{}
 	summary.FromDirs(dirs)
 	encoder := json.NewEncoder(c.stdout)

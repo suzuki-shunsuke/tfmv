@@ -7,10 +7,10 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 )
 
-func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*types.Block, error) {
+func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*domain.Block, error) {
 	file, diags := hclsyntax.ParseConfig(src, filePath, hcl.Pos{Byte: 0, Line: 1, Column: 1})
 	if diags.HasErrors() {
 		return nil, diags
@@ -19,7 +19,7 @@ func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*typ
 	if !ok {
 		return nil, errors.New("convert file body to body type")
 	}
-	blocks := make([]*types.Block, 0, len(body.Blocks))
+	blocks := make([]*domain.Block, 0, len(body.Blocks))
 	for _, block := range body.Blocks {
 		b, err := parseBlock(filePath, block, include, exclude)
 		if err != nil {
@@ -33,11 +33,11 @@ func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*typ
 	return blocks, nil
 }
 
-func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regexp.Regexp) (*types.Block, error) {
-	if _, ok := types.Types()[block.Type]; !ok {
+func parseBlock(filePath string, block *hclsyntax.Block, include, exclude *regexp.Regexp) (*domain.Block, error) {
+	if _, ok := domain.Types()[block.Type]; !ok {
 		return nil, nil //nolint:nilnil
 	}
-	b := &types.Block{
+	b := &domain.Block{
 		File:      filePath,
 		BlockType: block.Type,
 	}

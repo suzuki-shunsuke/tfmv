@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/spf13/afero"
-	"github.com/suzuki-shunsuke/tfmv/pkg/types"
+	"github.com/suzuki-shunsuke/tfmv/pkg/domain"
 )
 
 type Controller struct {
@@ -28,7 +28,7 @@ type Summary struct {
 }
 
 // FromDirs updates the Summary from a list of directories.
-func (s *Summary) FromDirs(dirs map[string]*types.Dir) {
+func (s *Summary) FromDirs(dirs map[string]*domain.Dir) {
 	s.Changes = []*Change{}
 	for _, dir := range dirs {
 		for _, block := range dir.Blocks {

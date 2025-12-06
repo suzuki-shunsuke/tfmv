@@ -1,4 +1,4 @@
-package types //nolint:revive
+package domain
 
 import "regexp"
 
