@@ -10,7 +10,7 @@ require (
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/pflag v1.0.10
 	github.com/suzuki-shunsuke/slog-error v0.2.2
-	github.com/suzuki-shunsuke/slog-util v0.3.1
+	github.com/suzuki-shunsuke/slog-util v0.3.2
 )
 
 require (
@@ -18,7 +18,7 @@ require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/lmittmann/tint v1.1.2 // indirect
+	github.com/lmittmann/tint v1.1.3 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
