@@ -5,7 +5,7 @@ jobs:
   test:
     uses: suzuki-shunsuke/go-test-full-workflow/.github/workflows/test.yaml@e442a17816baa8a940edc1544cc6e739d870e165 # v5.0.2
     with:
-      aqua_version: v2.58.1
+      aqua_version: v2.59.0
       golangci-lint-timeout: 120s
     permissions:
       pull-requests: write
@@ -24,7 +24,7 @@ jobs:
           go-version-file: go.mod
       - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
         with:
-          aqua_version: v2.58.1
+          aqua_version: v2.59.0
       - run: go install ./cmd/tfmv
       - run: tfmv --version
       - run: tfmv --help
