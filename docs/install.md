@@ -14,6 +14,12 @@ There are some ways to install tfmv.
 You can install tfmv using [Homebrew](https://brew.sh/).
 
 ```sh
+brew install tfmv
+```
+
+Or
+
+```sh
 brew install suzuki-shunsuke/tfmv/tfmv
 ```
 
@@ -64,7 +70,7 @@ aqua g -i cli/cli
 ```
 
 ```sh
-version=v0.1.1
+version=v1.0.0
 asset=tfmv_darwin_arm64.tar.gz
 gh release download -R suzuki-shunsuke/tfmv "$version" -p "$asset"
 gh attestation verify "$asset" \
@@ -81,7 +87,7 @@ aqua g -i slsa-framework/slsa-verifier
 ```
 
 ```sh
-version=v0.1.1
+version=v1.0.0
 asset=tfmv_darwin_arm64.tar.gz
 gh release download -R suzuki-shunsuke/tfmv "$version" -p "$asset" -p multiple.intoto.jsonl
 slsa-verifier verify-artifact "$asset" \
@@ -99,18 +105,16 @@ aqua g -i sigstore/cosign
 ```
 
 ```sh
-version=v0.1.1
+version=v1.0.0
 checksum_file="tfmv_${version#v}_checksums.txt"
 asset=tfmv_darwin_arm64.tar.gz
 gh release download "$version" \
   -R suzuki-shunsuke/tfmv \
   -p "$asset" \
   -p "$checksum_file" \
-  -p "${checksum_file}.pem" \
-  -p "${checksum_file}.sig"
+  -p "${checksum_file}.bundle"
 cosign verify-blob \
-  --signature "${checksum_file}.sig" \
-  --certificate "${checksum_file}.pem" \
+  --bundle "${checksum_file}.bundle" \
   --certificate-identity-regexp 'https://github\.com/suzuki-shunsuke/go-release-workflow/\.github/workflows/release\.yaml@.*' \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
   "$checksum_file"
