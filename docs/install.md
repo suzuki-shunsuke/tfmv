@@ -39,21 +39,8 @@ aqua g -i suzuki-shunsuke/tfmv
 ## Build an executable binary from source code yourself using Go
 
 ```sh
-git clone https://github.com/suzuki-shunsuke/tfmv
-cd tfmv
-go install ./cmd/tfmv
+go install github.com/suzuki-shunsuke/tfmv/cmd/tfmv@latest
 ```
-
-> [!WARNING]
-> Unfortunately, `go install github.com/suzuki-shunsuke/tfmv/cmd/tfmv@latest` doesn't work because tfmv uses a replace directive in go.mod.
-> 
-> ```console
-> $ go install github.com/suzuki-shunsuke/tfmv/cmd/tfmv@latest
-> go: github.com/suzuki-shunsuke/tfmv/cmd/tfmv@latest (in github.com/suzuki-shunsuke/tfmv@v0.1.1):
-> 	The go.mod file for the module providing named packages contains one or
-> 	more replace directives. It must not contain directives that would cause
-> 	it to be interpreted differently than if it were the main module.
-> ```
 
 ## GitHub Releases
 
