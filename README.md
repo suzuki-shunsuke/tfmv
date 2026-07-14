@@ -2,6 +2,7 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/suzuki-shunsuke/tfmv)
 [Install](docs/install.md)
+[AI-readable Go API index (llms.txt)](https://mitre88.github.io/tfmv-sourcey-docs/llms.txt)
 
 tfmv is a CLI to rename Terraform resources, data sources, and modules and generate moved blocks.
 
