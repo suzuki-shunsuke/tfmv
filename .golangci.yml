@@ -10,6 +10,7 @@ linters:
     - godot
     - godox
     - gomoddirectives
+    - gomodguard
     - ireturn
     - lll
     - musttag
