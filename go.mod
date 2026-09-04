@@ -1,6 +1,6 @@
 module github.com/suzuki-shunsuke/tfmv
 
-go 1.27.0
+go 1.27.1
 
 require (
 	github.com/google/go-jsonnet v0.22.0
