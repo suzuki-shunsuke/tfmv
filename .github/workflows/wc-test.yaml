@@ -20,7 +20,7 @@ jobs:
 
   integration-test:
     timeout-minutes: 20
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       id-token: write
