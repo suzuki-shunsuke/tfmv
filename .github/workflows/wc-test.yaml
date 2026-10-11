@@ -7,10 +7,12 @@ on:
         required: true
 jobs:
   test:
+    needs: [gomodule]
     uses: suzuki-shunsuke/go-test-full-workflow/.github/workflows/test.yaml@8e6155052a645b80a1dd9bf8d4f2668714977ca8 # v6.2.0
     with:
       aqua_version: v2.64.0
       golangci-lint-timeout: 120s
+      gomodule_artifact_name: gomodule
     secrets:
       TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
     permissions:
@@ -18,12 +20,24 @@ jobs:
       contents: read
       id-token: write
 
-  integration-test:
-    timeout-minutes: 20
-    runs-on: ubuntu-26.04
+  # Download Go modules once and share them with integration-test and test
+  gomodule:
+    uses: suzuki-shunsuke/download-go-module-action/.github/workflows/download.yaml@9b315459d80513111c52b004d15ad89e7b3e46b7 # v0.0.4
     permissions:
       contents: read
       id-token: write
+    with:
+      aqua_version: v2.64.0
+      aqua_packages: go-licenses # go-test-full-workflow requires go-licenses
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
+
+  integration-test:
+    timeout-minutes: 20
+    runs-on: ubuntu-26.04
+    needs: [gomodule]
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -31,10 +45,10 @@ jobs:
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
+          cache: false
 
-      - uses: flatt-security/setup-takumi-guard-golang@2e3c7c40b538cd68b2ac483def12982ebc8bc02e # v1
-        with:
-          bot-id: ${{secrets.TAKUMI_GUARD_BOT_ID}}
+      - name: Restore Go modules
+        uses: suzuki-shunsuke/download-go-module-action/restore@9b315459d80513111c52b004d15ad89e7b3e46b7 # v0.0.4
 
       - uses: aquaproj/aqua-installer@82d0e83878a8657c4a6f2ff1755d3bfbfc67f329 # v4.1.0
         with:
