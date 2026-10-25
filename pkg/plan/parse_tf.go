@@ -13,7 +13,7 @@ import (
 func parse(src []byte, filePath string, include, exclude *regexp.Regexp) ([]*domain.Block, error) {
 	file, diags := hclsyntax.ParseConfig(src, filePath, hcl.Pos{Byte: 0, Line: 1, Column: 1})
 	if diags.HasErrors() {
-		return nil, diags
+		return nil, fmt.Errorf("parse HCL syntax: %w", diags)
 	}
 	body, ok := file.Body.(*hclsyntax.Body)
 	if !ok {
