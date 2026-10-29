@@ -6,7 +6,7 @@ require (
 	github.com/google/go-jsonnet v0.22.0
 	github.com/hashicorp/hcl/v2 v2.25.0
 	github.com/lintnet/go-jsonnet-native-functions v0.4.2
-	github.com/minamijoyo/hcledit v0.2.18
+	github.com/minamijoyo/hcledit v0.2.19
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/pflag v1.0.10
 	github.com/suzuki-shunsuke/slog-error v0.2.2
