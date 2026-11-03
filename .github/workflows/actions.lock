@@ -15,7 +15,7 @@ workflows:
     '.github/workflows/wc-test.yaml':
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-go@v7.0.0'
-        - 'aquaproj/aqua-installer@611554c6f0137ba41c8dd15aca8bee82504ea461'
+        - 'aquaproj/aqua-installer@v4.1.1'
         - 'suzuki-shunsuke/download-go-module-action@v0.0.10'
 dependencies:
     'actions/checkout@v7.0.1':
@@ -34,6 +34,11 @@ dependencies:
         owner_id: 44036562
         repo_id: 192624594
     'aquaproj/aqua-installer@611554c6f0137ba41c8dd15aca8bee82504ea461':
+        ref: 'v4.1.1'
+        commit: 'sha1-611554c6f0137ba41c8dd15aca8bee82504ea461'
+        owner_id: 95116411
+        repo_id: 400140776
+    'aquaproj/aqua-installer@v4.1.1':
         ref: 'v4.1.1'
         commit: 'sha1-611554c6f0137ba41c8dd15aca8bee82504ea461'
         owner_id: 95116411
