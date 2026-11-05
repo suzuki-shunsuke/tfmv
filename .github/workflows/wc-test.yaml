@@ -53,7 +53,7 @@ jobs:
 
       - uses: aquaproj/aqua-installer@v4.1.1
         with:
-          aqua_version: v2.66.0
+          aqua_version: v2.66.1
       - run: go install ./cmd/tfmv
       - run: tfmv --version
       - run: tfmv --help
