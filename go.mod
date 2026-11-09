@@ -8,7 +8,7 @@ require (
 	github.com/lintnet/go-jsonnet-native-functions v0.4.2
 	github.com/minamijoyo/hcledit v0.2.19
 	github.com/spf13/afero v1.15.0
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 	github.com/suzuki-shunsuke/slog-error v0.2.2
 	github.com/suzuki-shunsuke/slog-util v0.3.2
 )
