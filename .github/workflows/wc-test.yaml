@@ -51,7 +51,7 @@ jobs:
       - name: Restore Go modules
         uses: suzuki-shunsuke/download-go-module-action/restore@v0.0.10
 
-      - uses: aquaproj/aqua-installer@v4.1.1
+      - uses: aquaproj/aqua-installer@v4.1.2
         with:
           aqua_version: v2.66.1
       - run: go install ./cmd/tfmv
